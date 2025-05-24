@@ -1,5 +1,3 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import {
   FormControl,
@@ -8,18 +6,31 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectValue,
+  SelectTrigger,
+} from "@/components/ui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Eye, EyeOff, Lock, Mail, User } from "lucide-react";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
-import { Mail, Lock, Eye, EyeOff } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import Image from "next/image";
-interface LoginFormProps {
+
+interface RegisterFormProps {
   onToggle: () => void;
 }
 
 const schema = z.object({
+  name: z
+    .string()
+    .nonempty({ message: "O nome é obrigatório" })
+    .min(2, { message: "O nome deve ter no mínimo 2 caracteres" }),
   email: z
     .string()
     .nonempty({ message: "O e-mail é obrigatório" })
@@ -28,15 +39,22 @@ const schema = z.object({
     .string()
     .nonempty({ message: "A senha é obrigatória" })
     .min(6, { message: "A senha deve ter no mínimo 6 caracteres" }),
+  userType: z.enum(["collector", "generator"]),
 });
 
 type Schema = z.infer<typeof schema>;
 
-export default function LoginForm({ onToggle }: LoginFormProps) {
+const ENUM = [
+  { label: "Coletor de resíduos", value: "collector" },
+  { label: "Gerador de resíduos", value: "generator" },
+];
+
+export default function RegisterForm({ onToggle }: RegisterFormProps) {
   const [isVisible, setIsVisible] = useState(false);
   const form = useForm<Schema>({
     resolver: zodResolver(schema),
     defaultValues: {
+      name: "",
       email: "",
       password: "",
     },
@@ -44,22 +62,33 @@ export default function LoginForm({ onToggle }: LoginFormProps) {
   const { handleSubmit } = form;
 
   async function onSubmit() {
-    console.log("Login");
+    console.log("Register");
   }
+  console.log("data", form.getValues());
 
   return (
     <div className="flex flex-col">
       <header>
-        <h1 className="font-medium text-3xl">Bem-vindo de volta!</h1>
+        <h1 className="font-medium text-3xl">Crie sua conta</h1>
         <p className="font-normal text-base mt-3 mb-12">
-          Conecte-se para contribuir com um futuro mais sustentável.
+          Junte-se a nós para um futuro mais sustentável.
         </p>
       </header>
       <FormProvider {...form}>
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="w-full flex flex-col gap-8"
-        >
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input placeholder="John Doe" startIcon={User} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="email"
@@ -68,7 +97,7 @@ export default function LoginForm({ onToggle }: LoginFormProps) {
                 <FormLabel>Email</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="email@exemplo.com"
+                    placeholder="email@example.com"
                     autoComplete="email"
                     startIcon={Mail}
                     {...field}
@@ -78,7 +107,6 @@ export default function LoginForm({ onToggle }: LoginFormProps) {
               </FormItem>
             )}
           />
-
           <FormField
             control={form.control}
             name="password"
@@ -109,53 +137,50 @@ export default function LoginForm({ onToggle }: LoginFormProps) {
               </FormItem>
             )}
           />
-          <Button type="submit">Login</Button>
-          <span className="flex items-center justify-center gap-4">
-            <hr className="w-full border-t border-gray-300" />
-            <span className="text-gray-500">ou</span>
-            <hr className="w-full border-t border-gray-300" />
-          </span>
-          <section className="flex gap-10 justify-center">
-            <div>
-              <Button
-                type="button"
-                variant="outline"
-                className="flex gap-3 text-sm"
-                /*  onClick={() => signIn("google", { callbackUrl: "/dashboard" })} */
-              >
-                <Image
-                  src="/images/icon-google.svg"
-                  alt="icon-google"
-                  width={20}
-                  height={20}
-                />
-                Entrar com Google
-              </Button>
-            </div>
-            <div>
-              <Button
-                type="button"
-                variant="outline"
-                className="flex gap-3 text-sm"
-                /*   onClick={() =>
-                  signIn("facebook", { callbackUrl: "/dashboard" })
-                } */
-              >
-                <Image
-                  src="/images/icon-facebook.svg"
-                  alt="icon-facebook"
-                  width={20}
-                  height={20}
-                />
-                Entrar com Facebook
-              </Button>
-            </div>
-          </section>
+          <FormField
+            control={form.control}
+            name="userType"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tipo de usuário</FormLabel>
+                <FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o tipo de usuário" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Tipos</SelectLabel>
+                        {ENUM.map((item) => (
+                          <SelectItem key={item.value} value={item.value}>
+                            {item.label}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button
+            variant="default"
+            className="mt-2"
+
+            //onClick={handleRegister}
+          >
+            Cadastrar
+          </Button>
           <span className="flex justify-center">
             <h1 className="mt-4">
-              Não possui uma conta?{" "}
+              Já possui uma conta?{" "}
               <button className="text-green-800 font-bold" onClick={onToggle}>
-                Cadastre-se
+                Faça login
               </button>
             </h1>
           </span>
