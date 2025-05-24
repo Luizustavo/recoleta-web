@@ -46,7 +46,7 @@ export function Header() {
 
       <span className="flex justify-end pt-3">
         <Button className="bg-[#F6F6F6] text-green-950">
-          <Link href="#">Acessar</Link>
+          <Link href="/login">Acessar</Link>
         </Button>
       </span>
     </main>
