@@ -15,6 +15,9 @@ import { z } from "zod";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
+import { useAuth } from "@/context/auth-context";
+import { useRouter } from "next/navigation";
+
 interface LoginFormProps {
   onToggle: () => void;
 }
@@ -42,9 +45,16 @@ export default function LoginForm({ onToggle }: LoginFormProps) {
     },
   });
   const { handleSubmit } = form;
+  const { signIn } = useAuth();
+  const router = useRouter();
 
-  async function onSubmit() {
-    console.log("Login");
+  async function onSubmit(payload: Schema) {
+    const authorized = await signIn(payload);
+
+    if (authorized) {
+      router.push("/dashboard");
+      router.refresh();
+    }
   }
 
   return (

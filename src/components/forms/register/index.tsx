@@ -64,7 +64,6 @@ export default function RegisterForm({ onToggle }: RegisterFormProps) {
   async function onSubmit() {
     console.log("Register");
   }
-  console.log("data", form.getValues());
 
   return (
     <div className="flex flex-col">

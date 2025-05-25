@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
+import { AuthProvider } from "@/context/auth-context";
 import { Roboto } from "next/font/google";
+import type { Metadata } from "next";
 import "./globals.css";
 
 const roboto = Roboto({
@@ -19,7 +20,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${roboto.className} antialiased`}>{children}</body>
+      <body className={`${roboto.className} antialiased`}>
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
 }
