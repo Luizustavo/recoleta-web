@@ -13,5 +13,5 @@ export interface AuthCoxtextData {
 }
 
 export type AccessResultType = {
-  accessToken: string;
+  access_token: string;
 };

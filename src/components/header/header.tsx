@@ -2,17 +2,17 @@
 
 import Image from "next/image";
 import { Button } from "../ui/button";
-import Link from "next/link";
-
+import { useRouter } from "next/navigation";
 export function Header() {
-
   const navTitles = [
     { title: "Notícias", href: "https://recoleta-news.vercel.app/" },
     { title: "Sobre nós", href: "#" },
     { title: "Nosso impacto", href: "#" },
     { title: "Parceiros", href: "#" },
   ];
-  
+
+  const router = useRouter();
+
   return (
     <main className="grid grid-cols-6 items-start px-6 relative z-10 pt-10">
       <header className="flex flex-row items-center gap-4">
@@ -45,8 +45,11 @@ export function Header() {
       </nav>
 
       <span className="flex justify-end pt-3">
-        <Button className="bg-[#F6F6F6] text-green-950">
-          <Link href="/login">Acessar</Link>
+        <Button
+          className="bg-[#F6F6F6] text-green-950"
+          onClick={() => router.push("/login")}
+        >
+          Acessar
         </Button>
       </span>
     </main>

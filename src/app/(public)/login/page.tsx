@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import LoginForm from "@/components/forms/login";
-import RegisterForm from "@/components/forms/register";
+import LoginForm from "@/components/forms/access/login-form";
+import RegisterForm from "@/components/forms/access/register-form";
 import { useState } from "react";
 
 export default function Login() {

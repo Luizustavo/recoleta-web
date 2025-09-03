@@ -1,6 +1,6 @@
 "use client";
 
-import { Header } from "@/components/header";
+import { Header } from "@/components/header/header";
 import { Button } from "@/components/ui/button";
 export default function Home() {
   return (
@@ -45,8 +45,8 @@ export default function Home() {
           </p>
 
           <nav className="mt-6 flex gap-4" aria-label="Ações principais">
-            <Button
-              className="bg-white text-green-800 border border-green-800 font-bold p-6 focus:ring-2 focus:ring-green-900 focus:ring-offset-2 transition-colors"
+            <Button 
+              className="bg-white text-green-800 border border-green-800 font-bold p-5 focus:ring-2 focus:ring-green-900 focus:ring-offset-2 transition-colors"
               //onClick={() => router.push("/login?loginComponent=false")}
               aria-label="Ir para página de cadastro"
             >
@@ -54,7 +54,7 @@ export default function Home() {
             </Button>
             <Button
               variant="default"
-              className="bg-transparent text-white border-white border font-bold p-6 focus:ring-2 focus:ring-white focus:ring-offset-2 transition-colors"
+              className="bg-transparent text-white border-white border font-bold p-5 focus:ring-2 focus:ring-white focus:ring-offset-2 transition-colors"
               aria-label="Saiba como apoiar nossa causa"
             >
               Apoie nossa causa

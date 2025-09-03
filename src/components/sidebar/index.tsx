@@ -53,7 +53,7 @@ const data = {
         },
         {
           title: "Descartar Resíduo",
-          url: "/waste-register",
+          url: "/discard",
         },
       ],
     },

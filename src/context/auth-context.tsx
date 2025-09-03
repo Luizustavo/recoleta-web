@@ -18,7 +18,6 @@ function AuthProvider({ children }: AuthProps) {
       await new Promise((resolve) => {
         setTimeout(resolve, 1000);
       });
-      console.log("user", user);
       const { ok } = await fetchWrapper<AccessResultType>(
         "/api/auth",
         {
@@ -41,10 +40,11 @@ function AuthProvider({ children }: AuthProps) {
   }
 
   async function signOut() {
-    await api("/auth/logout", {
+    await api("/api/auth", {
       method: "DELETE",
     });
   }
+
   return (
     <AuthContext.Provider value={{ signIn, signOut }}>
       {children}

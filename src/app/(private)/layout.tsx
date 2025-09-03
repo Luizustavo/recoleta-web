@@ -7,10 +7,11 @@ import { ModeToggle } from "@/theme/mode-toggle";
 import { AuthProvider } from "@/context/auth-context";
 import { useEffect, useState } from "react";
 import { ThemeProvider } from "@/context/theme-provider";
+import { FormProvider, useForm } from "react-hook-form";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
-
+  const form = useForm();
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -35,7 +36,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <Separator orientation="vertical" className="mr-2 h-4" />
               <ModeToggle />
             </div>
-            {children}
+            <FormProvider {...form}>{children}</FormProvider>
           </main>
         </AuthProvider>
       </SidebarProvider>

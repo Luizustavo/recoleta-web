@@ -1,7 +1,7 @@
 "use client";
 
-import { BarChartLabel } from "@/components/charts/bar-chart/index";
-import { LineChartComponent } from "@/components/charts/line-chart/index";
+import { BarChartLabel } from "@/components/charts/bar-chart";
+import { LineChartComponent } from "@/components/charts/line-chart";
 import {
   Card,
   CardContent,
