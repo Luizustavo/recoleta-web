@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import LoginForm from "@/components/forms/access/login-form";
-import RegisterForm from "@/components/forms/access/register-form";
+import RegisterFormSimple from "@/components/forms/access/register-form-simple";
 import { useState } from "react";
 
 export default function Login() {
@@ -35,7 +35,7 @@ export default function Login() {
         {isLogin ? (
           <LoginForm onToggle={() => setIsLogin(false)} />
         ) : (
-          <RegisterForm onToggle={() => setIsLogin(true)} />
+          <RegisterFormSimple onToggle={() => setIsLogin(true)} />
         )}
       </section>
     </main>

@@ -1,4 +1,5 @@
 import { AuthProvider } from "@/context/auth-context";
+import { Toaster } from "@/components/ui/sonner";
 import { Roboto } from "next/font/google";
 
 import type { Metadata } from "next";
@@ -23,8 +24,8 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${roboto.className} antialiased`}>
         <AuthProvider>
-          
-            {children}
+          {children}
+          <Toaster />
         </AuthProvider>
       </body>
     </html>

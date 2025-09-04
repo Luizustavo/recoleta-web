@@ -7,8 +7,15 @@ export interface AccessType {
   password: string;
 }
 
+export interface RegisterType {
+  name: string;
+  email: string;
+  password: string;
+}
+
 export interface AuthCoxtextData {
   signIn: (user: AccessType) => Promise<boolean>;
+  signUp: (user: RegisterType) => Promise<boolean>;
   signOut: () => Promise<void>;
 }
 

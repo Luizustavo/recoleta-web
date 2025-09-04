@@ -1,58 +1,99 @@
 "use client";
-
+import React, { createContext, useContext, ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import { fetchWrapper } from "@/lib/fetch-wrapper";
-import {
-  AuthProps,
-  AccessType,
-  AuthCoxtextData,
-  AccessResultType,
-} from "@/types/auth-type";
-import { createContext, useContext } from "react";
-import { api } from "@/lib/auth-data";
+import { AccessType, AuthCoxtextData, RegisterType } from "@/types/auth-type";
 
-const AuthContext = createContext({} as AuthCoxtextData);
+const AuthContext = createContext<AuthCoxtextData | undefined>(undefined);
 
-function AuthProvider({ children }: AuthProps) {
-  async function signIn(user: AccessType) {
-    try {
-      await new Promise((resolve) => {
-        setTimeout(resolve, 1000);
-      });
-      const { ok } = await fetchWrapper<AccessResultType>(
-        "/api/auth",
-        {
-          method: "POST",
-          body: JSON.stringify(user),
-        },
-        false
-      );
-
-      if (!ok) {
-        console.log("Usuário ou senha incorretos");
-        return false;
-      }
-      return true;
-      //eslint-disable-next-line
-    } catch (error) {
-      console.log("Usuário ou senha incorretos");
-      return false;
-    }
+export const useAuth = (): AuthCoxtextData => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth precisa ser usado dentro de um AuthProvider");
   }
-
-  async function signOut() {
-    await api("/api/auth", {
-      method: "DELETE",
-    });
-  }
-
-  return (
-    <AuthContext.Provider value={{ signIn, signOut }}>
-      {children}
-    </AuthContext.Provider>
-  );
-}
-const useAuth = (): AuthCoxtextData => {
-  return useContext(AuthContext);
+  return context;
 };
 
-export { AuthProvider, useAuth };
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const router = useRouter();
+
+  const signIn = async (user: AccessType): Promise<boolean> => {
+    try {
+      const response = await fetch("/api/auth", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+      });
+
+      if (!response.ok) {
+        return false;
+      }
+
+      console.log("Login realizado com sucesso");
+      return true;
+    } catch (error) {
+      console.error("Erro ao fazer login:", error);
+      return false;
+    }
+  };
+
+  const signUp = async (user: RegisterType): Promise<boolean> => {
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+      });
+
+      if (!response.ok) {
+        throw new Error("Falha no registro");
+      }
+
+      console.log("Registro realizado com sucesso");
+      router.push("/login");
+      return true;
+    } catch (error) {
+      console.error("Erro ao fazer registro:", error);
+      return false;
+    }
+  };
+
+  const signOut = async (): Promise<void> => {
+    try {
+      const response = await fetch("/api/auth", {
+        method: "DELETE",
+        headers: {
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Falha no logout");
+      }
+
+      console.log("Logout realizado com sucesso");
+      router.push("/login");
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error);
+      router.push("/login");
+    }
+  };
+
+  const value: AuthCoxtextData = {
+    signIn,
+    signUp,
+    signOut,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};

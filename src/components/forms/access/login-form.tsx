@@ -12,6 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
+import { toast } from "sonner";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
@@ -37,6 +38,7 @@ type Schema = z.infer<typeof schema>;
 
 export default function LoginForm({ onToggle }: LoginFormProps) {
   const [isVisible, setIsVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const form = useForm<Schema>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -49,11 +51,33 @@ export default function LoginForm({ onToggle }: LoginFormProps) {
   const router = useRouter();
 
   async function onSubmit(payload: Schema) {
-    const authorized = await signIn(payload);
+    setIsLoading(true);
+    
+    try {
+      const authorized = await signIn(payload);
 
-    if (authorized) {
-      router.push("/dashboard");
-      router.refresh();
+      if (authorized) {
+        toast.success("Login realizado com sucesso!", {
+          description: "Redirecionando para o dashboard...",
+          duration: 2000,
+        });
+        
+        setTimeout(() => {
+          router.push("/dashboard");
+          router.refresh();
+        }, 1000);
+      } else {
+        toast.error("Falha no login", {
+          description: "Email ou senha incorretos. Verifique suas credenciais e tente novamente.",
+        });
+      }
+    } catch (error) {
+      toast.error("Erro de conexão", {
+        description: "Não foi possível conectar ao servidor. Tente novamente.",
+      });
+      console.error("Erro durante o login:", error);
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -106,9 +130,9 @@ export default function LoginForm({ onToggle }: LoginFormProps) {
                         onClick={() => setIsVisible(!isVisible)}
                       >
                         {isVisible ? (
-                          <Eye className="text-muted-foreground" size={18} />
+                          <Eye className="text-muted-foreground" size={20} />
                         ) : (
-                          <EyeOff className="text-muted-foreground" size={18} />
+                          <EyeOff className="text-muted-foreground" size={20} />
                         )}
                       </button>
                     }
@@ -119,7 +143,13 @@ export default function LoginForm({ onToggle }: LoginFormProps) {
               </FormItem>
             )}
           />
-          <Button type="submit">Login</Button>
+          <Button 
+            type="submit" 
+            disabled={isLoading}
+            className="w-full"
+          >
+            {isLoading ? "Entrando..." : "Login"}
+          </Button>
           <span className="flex items-center justify-center gap-4">
             <hr className="w-full border-t border-gray-300" />
             <span className="text-gray-500">ou</span>

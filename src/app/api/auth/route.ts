@@ -27,28 +27,51 @@ export async function POST(request: Request) {
   if (!ok) return NextResponse.json({ error: statusText }, { status });
 
   (await cookies()).set(AUTH_COOKIE ?? "", data.access_token, {
-    path: "/dashboard",
-    secure: false,
+    path: "/",
+    secure: process.env.NODE_ENV === "production",
     httpOnly: true,
+    sameSite: "strict",
+    maxAge: 60 * 60 * 24 * 7,
   });
 
-  console.log('auth cookie', AUTH_COOKIE)
+  console.log("auth cookie", AUTH_COOKIE);
 
   return NextResponse.json({ access_token: data.access_token });
 }
 
 export async function DELETE() {
   try {
-    // ✅ idem no DELETE
-    (await cookies()).set(AUTH_COOKIE ?? "auth_token", "", {
+    const authCookieName = AUTH_COOKIE ?? "auth_token";
+
+    const cookieStore = await cookies();
+
+    const clearCookieOptions = {
       path: "/",
       secure: process.env.NODE_ENV === "production",
       httpOnly: true,
+      sameSite: "strict" as const,
       maxAge: 0,
-    });
+      expires: new Date(0),
+    };
 
-    return NextResponse.json({ success: true });
+    cookieStore.set(authCookieName, "", clearCookieOptions);
+
+    if (authCookieName !== "recoleta_access_token") {
+      cookieStore.set("recoleta_access_token", "", clearCookieOptions);
+    }
+
+    return NextResponse.json(
+      { success: true },
+      {
+        headers: {
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+      }
+    );
   } catch (error) {
+    console.error("Logout error:", error);
     return NextResponse.json(
       { error: (error as Error).message },
       { status: 500 }

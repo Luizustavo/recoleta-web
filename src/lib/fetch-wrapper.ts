@@ -11,7 +11,7 @@ console.log('init', init)
 
 
   if (logoutWhen401 && fetchResponse.status === 401) {
-    await fetch(`/api/auth/logout`, { method: "DELETE" });
+    await fetch(`/api/auth`, { method: "DELETE" });
     window.location.reload();
   }
 
