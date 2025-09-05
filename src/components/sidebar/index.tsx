@@ -43,16 +43,16 @@ const data = {
       icon: History,
       items: [
         {
-          title: "Minhas Coletas",
-          url: "#",
+          title: "Meus Descartes",
+          url: "/wastes",
+        },
+        {
+          title: "Novo Descarte",
+          url: "/discard",
         },
         {
           title: "Coletar Resíduo",
           url: "/waste-collection",
-        },
-        {
-          title: "Descartar Resíduo",
-          url: "/discard",
         },
       ],
     },
