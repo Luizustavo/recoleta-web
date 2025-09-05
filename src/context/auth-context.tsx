@@ -1,7 +1,6 @@
 "use client";
 import React, { createContext, useContext, ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { fetchWrapper } from "@/lib/fetch-wrapper";
 import { AccessType, AuthCoxtextData, RegisterType } from "@/types/auth-type";
 
 const AuthContext = createContext<AuthCoxtextData | undefined>(undefined);

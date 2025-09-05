@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { validateTokenWithHeader } from '@/lib/token-validation';
 import { cookies } from 'next/headers';
 

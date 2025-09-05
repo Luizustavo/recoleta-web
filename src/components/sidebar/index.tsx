@@ -134,6 +134,7 @@ export function SidebarComponent({
     email: "carregando@email.com",
   });
   const [isLoading, setIsLoading] = useState(true);
+  console.log(isLoading)
 
   useEffect(() => {
     const fetchUserData = async () => {

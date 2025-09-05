@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { validateTokenWithHeader } from '@/lib/token-validation';
 
-const publicRoutes = ["/", "/home", "/login"];
-
 const privateRoutes = ["/dashboard", "/discard"];
 
 async function isAuthenticated(request: NextRequest): Promise<boolean> {
@@ -21,17 +19,6 @@ async function isAuthenticated(request: NextRequest): Promise<boolean> {
     console.error('Erro ao validar token no middleware:', error);
     return false;
   }
-}
-
-function isPublicRoute(pathname: string): boolean {
-  return publicRoutes.some((route) => {
-    if (route === pathname) return true;
-    if (route.endsWith("/*")) {
-      const baseRoute = route.slice(0, -2);
-      return pathname.startsWith(baseRoute);
-    }
-    return false;
-  });
 }
 
 function isPrivateRoute(pathname: string): boolean {

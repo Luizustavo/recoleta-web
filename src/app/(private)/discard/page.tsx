@@ -60,45 +60,45 @@ export default function WasteRegister() {
       });
 
       const result = await WasteService.submitWaste(submissionData);
-      
+
       console.log("Descarte cadastrado com sucesso:", result);
-      
+
       toast.dismiss();
       toast.success("🎉 Descarte agendado com sucesso!", {
-        description: `ID: ${result.id} • Data: ${new Date(result.discardDate).toLocaleDateString('pt-BR')} • Horário: ${result.discardTime}`,
+        description: `ID: ${result.id} • Data: ${new Date(
+          result.discardDate
+        ).toLocaleDateString("pt-BR")} • Horário: ${result.discardTime}`,
         duration: 8000,
       });
 
       setStep(1);
       setWasteData(null);
       setAddressData(null);
-
     } catch (error) {
       console.error("Erro ao submeter descarte:", error);
-      
+
       toast.dismiss();
-      
+
       let errorMessage = "Erro desconhecido ao agendar descarte.";
-      let errorDescription = "Tente novamente em alguns momentos.";
-      
+
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-      
+
       if (errorMessage.includes("Token de autenticação não encontrado")) {
         toast.error("Sessão expirada", {
           description: "Faça login novamente para continuar.",
           action: {
             label: "Fazer Login",
-            onClick: () => window.location.href = "/login",
+            onClick: () => (window.location.href = "/login"),
           },
         });
       } else if (errorMessage.includes("401")) {
         toast.error("Não autorizado", {
           description: "Faça login novamente para continuar.",
           action: {
-            label: "Fazer Login", 
-            onClick: () => window.location.href = "/login",
+            label: "Fazer Login",
+            onClick: () => (window.location.href = "/login"),
           },
         });
       } else if (errorMessage.includes("400")) {

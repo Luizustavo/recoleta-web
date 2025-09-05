@@ -31,7 +31,6 @@ import {
   Wine,
   Wrench,
   Apple,
-  TreePine,
   Shirt,
   Package,
 } from "lucide-react";

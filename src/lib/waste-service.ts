@@ -1,6 +1,5 @@
 import { WasteFormData } from "@/components/features/discard/waste-form/types";
 import { AddressData } from "@/components/features/discard/address-form/types";
-import { fetchWrapperApi } from "./fetch-wrapper";
 
 export interface WasteSubmissionData {
   waste: WasteFormData;
