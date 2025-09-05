@@ -41,6 +41,7 @@ const data = {
       title: "Gerenciar Coletas",
       url: "#",
       icon: History,
+      isActive: true,
       items: [
         {
           title: "Meus Descartes",
