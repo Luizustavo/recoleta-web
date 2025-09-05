@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Countup from "react-countup";
-//import { useAuth } from "@/context/auth-context";
+import { useEffect, useState } from "react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -21,7 +21,31 @@ import {
 } from "@/components/ui/breadcrumb";
 
 export default function Dashboard() {
-  //const { userData } = useAuth();
+  const [userName, setUserName] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch('/api/auth/me');
+        
+        if (response.ok) {
+          const data = await response.json();
+          setUserName(data.user.name);
+        } else {
+          setUserName('Usuário');
+        }
+      } catch (error) {
+        console.error('Erro ao buscar dados do usuário:', error);
+        setUserName('Usuário');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
 
   return (
     <div className="flex-1  ">
@@ -38,8 +62,7 @@ export default function Dashboard() {
           <Card className="w-full col-span-2">
             <CardHeader>
               <CardTitle>
-                Parabéns, {/* {userData?.firstName} {""}
-                {userData?.lastName ? userData.lastName : ""}! */} 🎉
+                Parabéns, {isLoading ? 'carregando...' : userName}! 🎉
               </CardTitle>
               <CardDescription className="pt-3 flex flex-col text-sm ">
                 <h1 className="text-success font-bold">
@@ -110,8 +133,8 @@ export default function Dashboard() {
             </CardHeader>
           </Card>
         </div>
-        <div className="grid sm:grid-cols-4 gap-5 mt-5 ">
-          <div className="col-span-4 grid grid-cols gap-5 ">
+        <div className="grid sm:grid-cols-4 gap-5 mt-5">
+          <div className="col-span-4 grid grid-cols gap-5">
             <LineChartComponent />
           </div>
         </div>

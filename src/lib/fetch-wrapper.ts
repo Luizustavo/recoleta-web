@@ -31,8 +31,12 @@ export async function fetchWrapperApi<T = unknown>(
   input: string | Request,
   init?: RequestInit
 ): Promise<Response & { data: T }> {
-  const baseUrl = process.env.API_URL;
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || '';
   const url = typeof input === "string" ? input : input.url;
+
+  if (!baseUrl) {
+    throw new Error('API_URL não está configurada nas variáveis de ambiente');
+  }
 
   const fetchResponse = await fetch(`${baseUrl}${url}`, init);
 

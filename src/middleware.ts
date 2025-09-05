@@ -1,30 +1,12 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { validateTokenWithHeader } from '@/lib/token-validation';
 
 const publicRoutes = ["/", "/home", "/login"];
 
 const privateRoutes = ["/dashboard", "/discard"];
 
-function isValidJWT(token: string): boolean {
-  try {
-    const parts = token.split(".");
-    if (parts.length !== 3) return false;
-
-    const payload = JSON.parse(atob(parts[1]));
-
-    if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
-      console.log("Token expirado");
-      return false;
-    }
-
-    return true;
-  } catch (error) {
-    console.log("Token inválido:", error);
-    return false;
-  }
-}
-
-function isAuthenticated(request: NextRequest): boolean {
+async function isAuthenticated(request: NextRequest): Promise<boolean> {
   const authCookieName = process.env.AUTH_COOKIE || "auth_token";
   const token = request.cookies.get(authCookieName)?.value;
 
@@ -32,7 +14,13 @@ function isAuthenticated(request: NextRequest): boolean {
     return false;
   }
 
-  return isValidJWT(token);
+  try {
+    const result = await validateTokenWithHeader(token);
+    return result.valid;
+  } catch (error) {
+    console.error('Erro ao validar token no middleware:', error);
+    return false;
+  }
 }
 
 function isPublicRoute(pathname: string): boolean {
@@ -49,7 +37,6 @@ function isPublicRoute(pathname: string): boolean {
 function isPrivateRoute(pathname: string): boolean {
   return privateRoutes.some((route) => {
     if (route === pathname) return true;
-    // Suporte para rotas dinâmicas
     if (route.endsWith("/*")) {
       const baseRoute = route.slice(0, -2);
       return pathname.startsWith(baseRoute);
@@ -58,7 +45,7 @@ function isPrivateRoute(pathname: string): boolean {
   });
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (
@@ -69,7 +56,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const authenticated = isAuthenticated(request);
+  const authenticated = await isAuthenticated(request);
 
   if (isPrivateRoute(pathname) && !authenticated) {
     const loginUrl = new URL("/login", request.url);

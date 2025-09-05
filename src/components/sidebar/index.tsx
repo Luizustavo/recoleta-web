@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useState, useEffect } from "react";
 import {
   Handshake,
   History,
@@ -27,8 +28,6 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import Image from "next/image";
-//import { useAuth } from "@/context/auth-context";
-//import { SidebarMenuSkeleton } from "@/components/ui/sidebar";
 
 const data = {
   navMain: [
@@ -130,11 +129,43 @@ const data = {
 export function SidebarComponent({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
-  /*   const { userData, loading } = useAuth();
-  if (loading) {
-    return <SidebarMenuSkeleton />;
-  }
- */
+  const [userData, setUserData] = useState({
+    name: "Carregando...",
+    email: "carregando@email.com",
+  });
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch("/api/auth/me");
+
+        if (response.ok) {
+          const data = await response.json();
+          setUserData({
+            name: data.user.name,
+            email: data.user.email,
+          });
+        } else {
+          setUserData({
+            name: "Usuário",
+            email: "usuario@email.com",
+          });
+        }
+      } catch (error) {
+        console.error("Erro ao buscar dados do usuário:", error);
+        setUserData({
+          name: "Usuário",
+          email: "usuario@email.com",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>
@@ -168,10 +199,8 @@ export function SidebarComponent({
       <SidebarFooter>
         <NavUser
           user={{
-            /*  name: `${userData?.firstName ?? ""} ${userData?.lastName ?? ""}`,
-            email: userData?.email ?? "", */
-            name: "John Doe",
-            email: "johndoe@email.com",
+            name: userData.name,
+            email: userData.email,
             avatar: "https://api.dicebear.com/9.x/bottts/svg",
           }}
         />
