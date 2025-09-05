@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { validateTokenWithHeader } from '@/lib/token-validation';
 import { cookies } from 'next/headers';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const authCookieName = process.env.AUTH_COOKIE || 'auth_token';
+    const authCookieName = process.env.AUTH_COOKIE || 'recoleta_access_token';
     const cookieStore = await cookies();
     const token = cookieStore.get(authCookieName)?.value;
 

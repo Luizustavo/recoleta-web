@@ -7,7 +7,7 @@ const publicRoutes = ["/", "/home", "/login"];
 const privateRoutes = ["/dashboard", "/discard"];
 
 async function isAuthenticated(request: NextRequest): Promise<boolean> {
-  const authCookieName = process.env.AUTH_COOKIE || "auth_token";
+  const authCookieName = process.env.AUTH_COOKIE || "recoleta_access_token";
   const token = request.cookies.get(authCookieName)?.value;
 
   if (!token || token.trim() === "") {
