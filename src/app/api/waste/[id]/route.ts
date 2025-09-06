@@ -15,7 +15,7 @@ export async function GET(request: NextRequest, context: Context) {
     const { id } = await context.params;
 
     // Conforme documentação, esta rota não requer autenticação
-    const response = await fetchWrapperApi(`/waste/${id}`, {
+    const response = await fetchWrapperApi(`/api/waste/${id}`, {
       method: "GET",
     });
 
@@ -54,7 +54,7 @@ export async function PUT(request: NextRequest, context: Context) {
 
     const body = await request.json();
 
-    const response = await fetchWrapperApi(`/waste/${id}`, {
+    const response = await fetchWrapperApi(`/api/waste/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -96,7 +96,7 @@ export async function DELETE(request: NextRequest, context: Context) {
       );
     }
 
-    const response = await fetchWrapperApi(`/waste/${id}`, {
+    const response = await fetchWrapperApi(`/api/waste/${id}`, {
       method: "DELETE",
       headers: {
         "Authorization": `Bearer ${token}`,

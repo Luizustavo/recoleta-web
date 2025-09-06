@@ -67,7 +67,7 @@ export default function WasteRegister() {
       toast.success("🎉 Descarte agendado com sucesso!", {
         description: `ID: ${result.id} • Data: ${new Date(
           result.discardDate
-        ).toLocaleDateString("pt-BR")} • Horário: ${result.discardTime}`,
+        ).toLocaleDateString("pt-BR")}`,
         duration: 8000,
       });
 

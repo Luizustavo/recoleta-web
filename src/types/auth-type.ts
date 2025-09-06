@@ -20,5 +20,15 @@ export interface AuthCoxtextData {
 }
 
 export type AccessResultType = {
-  access_token: string;
+  success: boolean;
+  message: string;
+  code: string;
+  data: {
+    access_token: string;
+    user: {
+      id: string;
+      email: string;
+      name: string;
+    };
+  };
 };

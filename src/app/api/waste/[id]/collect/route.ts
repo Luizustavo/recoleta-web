@@ -29,7 +29,7 @@ export async function POST(
       );
     }
 
-    const response = await fetchWrapperApi(`/waste/${id}/collect`, {
+    const response = await fetchWrapperApi(`/api/waste/${id}/collect`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -15,7 +15,7 @@ export async function POST(request: Request) {
   });
 
   const { ok, data, status, statusText } =
-    await fetchWrapperApi<AccessResultType>("/auth/signIn", {
+    await fetchWrapperApi<AccessResultType>("/api/auth/signIn", {
       method: "POST",
       body: param,
       headers: {
@@ -26,7 +26,15 @@ export async function POST(request: Request) {
 
   if (!ok) return NextResponse.json({ error: statusText }, { status });
 
-  (await cookies()).set(AUTH_COOKIE ?? "", data.access_token, {
+  // O backend retorna { success, data: { access_token, user } }
+  const accessToken = data.data.access_token;
+  
+  if (!accessToken) {
+    console.error("Token não encontrado na resposta:", data);
+    return NextResponse.json({ error: "Token não encontrado na resposta" }, { status: 500 });
+  }
+
+  (await cookies()).set(AUTH_COOKIE ?? "", accessToken, {
     path: "/",
     secure: process.env.NODE_ENV === "production",
     httpOnly: true,
@@ -36,7 +44,10 @@ export async function POST(request: Request) {
 
   console.log("auth cookie", AUTH_COOKIE);
 
-  return NextResponse.json({ access_token: data.access_token });
+  return NextResponse.json({ 
+    access_token: accessToken,
+    user: data.data.user
+  });
 }
 
 export async function DELETE() {

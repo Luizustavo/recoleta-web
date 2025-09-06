@@ -36,8 +36,8 @@ async function isAuthenticated(request: NextRequest): Promise<boolean> {
     const result = await response.json();
     console.log("Middleware - Backend validation result:", result);
     
-    // Verificar o formato de resposta do backend: {success: true, data: {valid: true}}
-    return result.success === true && result.data?.valid === true;
+    // Verificar o formato de resposta do backend conforme a documentação
+    return result.success && result.data?.valid === true;
   } catch (error) {
     console.error('Erro ao validar token no middleware:', error);
     return false;

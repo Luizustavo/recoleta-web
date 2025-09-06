@@ -18,7 +18,7 @@ export async function validateTokenWithBody(
 ): Promise<TokenValidationResponse> {
   try {
     const response = await fetchWrapperApi<TokenValidationResponse>(
-      "/auth/validate-token",
+      "/api/auth/validate-token",
       {
         method: "POST",
         headers: {
@@ -40,7 +40,7 @@ export async function validateTokenWithHeader(
 ): Promise<TokenValidationResponse> {
   try {
     const response = await fetchWrapperApi<TokenValidationResponse>(
-      "/auth/validate",
+      "/api/auth/validate",
       {
         method: "GET",
         headers: {

@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     }
 
     const { ok, data, status, statusText } = await fetchWrapperApi(
-      "/user", 
+      "/api/user", 
       {
         method: "POST",
         headers: {

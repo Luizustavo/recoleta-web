@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
     const queryString = searchParams.toString();
 
     // Conforme documentação, esta rota não requer autenticação
-    const response = await fetchWrapperApi(`/waste/available${queryString ? `?${queryString}` : ''}`, {
+    const response = await fetchWrapperApi(`/api/waste/available${queryString ? `?${queryString}` : ''}`, {
       method: "GET",
     });
 

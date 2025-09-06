@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
 
-    const response = await fetchWrapperApi("/waste", {
+    const response = await fetchWrapperApi("/api/waste", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -60,7 +60,7 @@ export async function GET() {
       );
     }
 
-    const response = await fetchWrapperApi("/waste", {
+    const response = await fetchWrapperApi("/api/waste", {
       method: "GET",
       headers: {
         "Authorization": `Bearer ${token}`,
