@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Eye, Trash2 } from "lucide-react";
-import { WasteResponse } from "@/lib/waste-service";
+import { WasteResponse } from "@/types/waste-api";
 import { WasteStatusBadge } from "../../ui/waste-status-badge";
 import { WasteTypeIcon } from "../../ui/waste-type-icon";
 import { translateWasteType } from "@/lib/waste-type-translator";
@@ -22,8 +22,11 @@ export function WasteListItem({ waste, onViewDetails, onDelete }: WasteListItemP
     });
   };
 
-  const formatTime = (timeString: string) => {
-    return timeString.slice(0, 5);
+  const formatTime = (dateString: string) => {
+    return new Date(dateString).toLocaleTimeString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   return (
@@ -49,12 +52,18 @@ export function WasteListItem({ waste, onViewDetails, onDelete }: WasteListItemP
         {/* Endereço */}
         <div className="text-gray-700">
           <div className="max-w-xs">
-            <p className="font-medium text-sm truncate">
-              {waste.address.street}, {waste.address.number}
-            </p>
-            <p className="text-xs text-gray-500 truncate">
-              {waste.address.neighborhood}, {waste.address.city}
-            </p>
+            {waste.address ? (
+              <>
+                <p className="font-medium text-sm truncate">
+                  {waste.address.street}, {waste.address.number}
+                </p>
+                <p className="text-xs text-gray-500 truncate">
+                  {waste.address.neighborhood}, {waste.address.city}
+                </p>
+              </>
+            ) : (
+              <p className="text-sm text-gray-500">Endereço não disponível</p>
+            )}
           </div>
         </div>
 
@@ -65,7 +74,7 @@ export function WasteListItem({ waste, onViewDetails, onDelete }: WasteListItemP
               {formatDate(waste.discardDate)}
             </p>
             <p className="text-xs text-gray-500">
-              {formatTime(waste.discardTime)}
+              {formatTime(waste.discardDate)}
             </p>
           </div>
         </div>
@@ -73,7 +82,7 @@ export function WasteListItem({ waste, onViewDetails, onDelete }: WasteListItemP
         {/* Status */}
         <div>
           <div className="w-fit">
-            <WasteStatusBadge discardDate={waste.discardDate} discardTime={waste.discardTime} />
+            <WasteStatusBadge discardDate={waste.discardDate} />
           </div>
         </div>
 

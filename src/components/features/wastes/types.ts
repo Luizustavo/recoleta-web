@@ -1,4 +1,4 @@
-import { WasteResponse } from "@/lib/waste-service";
+import { WasteResponse } from "@/types/waste-api";
 
 export interface WasteDetailsModalProps {
   waste: WasteResponse | null;
@@ -30,11 +30,21 @@ export interface UseWasteActionsResult {
   handleCloseDeleteModal: () => void;
 }
 
+export interface PaginationInfo {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
 export interface UseWastesResult {
   wastes: WasteResponse[];
   loading: boolean;
   refreshing: boolean;
+  pagination: PaginationInfo | null;
   fetchWastes: (showRefreshToast?: boolean) => Promise<void>;
   refreshWastes: () => Promise<void>;
   removeWaste: (wasteId: string) => void;
+  loadPage: (page: number) => Promise<void>;
+  setPageSize: (limit: number) => Promise<void>;
 }

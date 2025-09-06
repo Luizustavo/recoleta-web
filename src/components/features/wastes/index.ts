@@ -6,6 +6,7 @@ export { WasteListItem } from './components/list-items/waste-list-item';
 export { WasteMobileCard } from './components/list-items/waste-mobile-card';
 export { WasteStatusBadge } from './components/ui/waste-status-badge';
 export { WasteTypeIcon } from './components/ui/waste-type-icon';
+export { WastePagination } from './components/ui/pagination';
 
 // Hooks
 export { useWastes } from './hooks/use-wastes';

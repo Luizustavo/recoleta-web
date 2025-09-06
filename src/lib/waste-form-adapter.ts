@@ -40,7 +40,10 @@ const CONDITION_MAPPING: Record<string, ConditionType> = {
 export async function convertFormDataToAPI(
   wasteData: WasteFormData,
   addressData: AddressData
-): Promise<CreateWasteRequest> {
+): Promise<{
+  waste: CreateWasteRequest['waste'];
+  address: Omit<CreateWasteRequest['address'], 'latitude' | 'longitude'>;
+}> {
   // Converter imagens para base64 se necessário
   let images: string[] = [];
   if (wasteData.imagens && wasteData.imagens.length > 0) {

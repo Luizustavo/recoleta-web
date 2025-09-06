@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { WasteResponse } from "@/lib/waste-service";
+import { WasteResponse } from "@/types/waste-api";
 import { translateWasteType } from "@/lib/waste-type-translator";
 import { WasteStatusBadge } from "../../ui/waste-status-badge";
 import { WasteTypeIcon } from "../../ui/waste-type-icon";
@@ -61,8 +61,7 @@ export function WasteDetailsModal({
                 {translateWasteType(waste.wasteType)}
               </DialogTitle>
               <WasteStatusBadge 
-                discardDate={waste.discardDate} 
-                discardTime={waste.discardTime} 
+                discardDate={waste.discardDate}
               />
             </div>
             <DialogDescription>

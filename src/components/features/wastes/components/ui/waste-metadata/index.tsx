@@ -1,6 +1,6 @@
 "use client";
 
-import { WasteResponse } from "@/lib/waste-service";
+import { WasteResponse } from "@/types/waste-api";
 
 interface WasteMetadataProps {
   waste: WasteResponse;

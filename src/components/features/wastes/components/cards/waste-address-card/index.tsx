@@ -3,13 +3,23 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MapPin } from "lucide-react";
-import { WasteResponse } from "@/lib/waste-service";
+import { WasteResponse } from "@/types/waste-api";
 
 interface WasteAddressCardProps {
   waste: WasteResponse;
 }
 
 export function WasteAddressCard({ waste }: WasteAddressCardProps) {
+  if (!waste.address) {
+    return (
+      <Card>
+        <CardContent className="pt-6">
+          <p className="text-gray-500">Endereço não disponível</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -46,7 +56,7 @@ export function WasteAddressCard({ waste }: WasteAddressCardProps) {
           </div>
         )}
 
-        {waste.address.isMain && (
+        {waste.address.main && (
           <Badge variant="outline" className="text-xs">
             Endereço Principal
           </Badge>

@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { WasteService, WasteResponse } from "@/lib/waste-service";
+import { WasteService } from "@/lib/waste-service";
+import { WasteResponse } from "@/types/waste-api";
 import { UseWasteActionsResult } from "../types";
 
 interface UseWasteActionsProps {

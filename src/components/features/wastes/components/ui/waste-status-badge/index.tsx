@@ -3,12 +3,11 @@ import { Clock, CheckCircle, Calendar as CalendarIcon } from "lucide-react";
 
 interface WasteStatusBadgeProps {
   discardDate: string;
-  discardTime: string;
 }
 
-export function WasteStatusBadge({ discardDate, discardTime }: WasteStatusBadgeProps) {
+export function WasteStatusBadge({ discardDate }: WasteStatusBadgeProps) {
   const now = new Date();
-  const discardDateTime = new Date(`${discardDate}T${discardTime}`);
+  const discardDateTime = new Date(discardDate);
   
   const isPast = discardDateTime < now;
   const isToday = discardDateTime.toDateString() === now.toDateString();

@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Eye, Trash2, Calendar, MapPin } from "lucide-react";
-import { WasteResponse } from "@/lib/waste-service";
+import { WasteResponse } from "@/types/waste-api";
 import { WasteStatusBadge } from "../../ui/waste-status-badge";
 import { WasteTypeIcon } from "../../ui/waste-type-icon";
 import { translateWasteType } from "@/lib/waste-type-translator";
@@ -23,8 +23,11 @@ export function WasteMobileCard({ waste, onViewDetails, onDelete }: WasteMobileC
     });
   };
 
-  const formatTime = (timeString: string) => {
-    return timeString.slice(0, 5);
+  const formatTime = (dateString: string) => {
+    return new Date(dateString).toLocaleTimeString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   return (
@@ -45,7 +48,7 @@ export function WasteMobileCard({ waste, onViewDetails, onDelete }: WasteMobileC
             </div>
           </div>
           <div className="flex-shrink-0">
-            <WasteStatusBadge discardDate={waste.discardDate} discardTime={waste.discardTime} />
+            <WasteStatusBadge discardDate={waste.discardDate} />
           </div>
         </div>
         
@@ -53,14 +56,18 @@ export function WasteMobileCard({ waste, onViewDetails, onDelete }: WasteMobileC
           <Calendar className="h-3 w-3" />
           <span className="font-medium">{formatDate(waste.discardDate)}</span>
           <span>às</span>
-          <span>{formatTime(waste.discardTime)}</span>
+          <span>{formatTime(waste.discardDate)}</span>
           <span className="ml-2">•</span>
           <span className="font-medium">{waste.weight} kg</span>
         </div>
         
         <div className="flex items-center gap-1 text-xs text-gray-500 mb-3">
           <MapPin className="h-3 w-3" />
-          {waste.address.street}, {waste.address.number} - {waste.address.neighborhood}
+          {waste.address ? (
+            `${waste.address.street}, ${waste.address.number} - ${waste.address.neighborhood}`
+          ) : (
+            'Endereço não disponível'
+          )}
         </div>
         
         <div className="flex gap-2">

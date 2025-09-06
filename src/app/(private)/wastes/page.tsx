@@ -7,12 +7,13 @@ import {
   WastePageHeader,
   WasteListItem,
   WasteMobileCard,
+  WastePagination,
   useWastes,
   useWasteActions,
 } from "@/components/features/wastes";
 
 export default function WastesPage() {
-  const { wastes, loading, refreshing, refreshWastes, removeWaste } = useWastes();
+  const { wastes, loading, refreshing, pagination, refreshWastes, removeWaste, loadPage } = useWastes();
   const wasteActions = useWasteActions({ 
     onWasteDeleted: removeWaste
   });
@@ -120,6 +121,13 @@ export default function WastesPage() {
           </>
         )}
       </div>
+
+      {/* Paginação */}
+      <WastePagination 
+        pagination={pagination}
+        onPageChange={loadPage}
+        loading={loading || refreshing}
+      />
 
       <WasteDetailsModal
         waste={wasteActions.selectedWaste}

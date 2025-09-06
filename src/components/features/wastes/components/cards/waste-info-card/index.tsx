@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Weight, FileText } from "lucide-react";
-import { WasteResponse } from "@/lib/waste-service";
+import { WasteResponse } from "@/types/waste-api";
 import { WasteTypeIcon } from "../../ui/waste-type-icon";
 import { translateWasteType } from "@/lib/waste-type-translator";
 

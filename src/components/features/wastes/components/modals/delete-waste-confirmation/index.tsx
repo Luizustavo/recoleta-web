@@ -11,7 +11,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Trash2, AlertTriangle } from "lucide-react";
-import { WasteResponse } from "@/lib/waste-service";
+import { WasteResponse } from "@/types/waste-api";
 import { translateWasteType } from "@/lib/waste-type-translator";
 import { WasteTypeIcon } from "../../ui/waste-type-icon";
 
