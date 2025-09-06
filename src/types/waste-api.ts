@@ -54,6 +54,8 @@ export interface CreateWasteRequest {
     zipCode: string;
     reference?: string;
     main?: boolean;
+    latitude: string;  // ⭐ OBRIGATÓRIO: coordenada como string (ex: "-23.5505")
+    longitude: string; // ⭐ OBRIGATÓRIO: coordenada como string (ex: "-46.6333")
   };
 }
 
@@ -83,6 +85,8 @@ export interface AddressResponse {
   zipCode: string;
   reference?: string;
   main?: boolean;
+  latitude?: number;  // 📍 Retornado pelo backend como number
+  longitude?: number; // 📍 Retornado pelo backend como number
   createdAt?: string;
   updatedAt?: string;
 }

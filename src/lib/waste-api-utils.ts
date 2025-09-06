@@ -166,3 +166,180 @@ export async function filesToBase64Array(files: File[]): Promise<string[]> {
   const promises = files.map(file => fileToBase64(file));
   return Promise.all(promises);
 }
+
+/**
+ * ⭐ COORDENADAS - Utilitários para geolocalização
+ */
+
+/**
+ * Obtém a localização atual do usuário usando a API de geolocalização
+ */
+export function getCurrentPosition(options?: PositionOptions): Promise<GeolocationPosition> {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error('Geolocalização não é suportada pelo navegador'));
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => resolve(position),
+      (error) => {
+        let message = 'Erro ao obter localização';
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            message = 'Permissão para acessar localização foi negada';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            message = 'Localização não disponível';
+            break;
+          case error.TIMEOUT:
+            message = 'Timeout ao obter localização';
+            break;
+        }
+        reject(new Error(message));
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000,
+        ...options
+      }
+    );
+  });
+}
+
+/**
+ * Converte coordenadas numéricas para string no formato esperado pela API
+ */
+export function formatCoordinates(lat: number, lng: number): { latitude: string; longitude: string } {
+  return {
+    latitude: lat.toString(),
+    longitude: lng.toString()
+  };
+}
+
+/**
+ * Valida se as coordenadas estão dentro dos limites válidos
+ */
+export function validateCoordinates(latitude: string, longitude: string): { isValid: boolean; errors: string[] } {
+  const lat = parseFloat(latitude);
+  const lng = parseFloat(longitude);
+  
+  const errors: string[] = [];
+  
+  if (isNaN(lat)) {
+    errors.push('Latitude deve ser um número válido');
+  } else if (lat < -90 || lat > 90) {
+    errors.push('Latitude deve estar entre -90 e 90');
+  }
+  
+  if (isNaN(lng)) {
+    errors.push('Longitude deve ser um número válido');
+  } else if (lng < -180 || lng > 180) {
+    errors.push('Longitude deve estar entre -180 e 180');
+  }
+  
+  return {
+    isValid: errors.length === 0,
+    errors
+  };
+}
+
+/**
+ * Obtém coordenadas com fallback manual se a geolocalização falhar
+ */
+export async function getCoordinatesWithFallback(): Promise<{ latitude: string; longitude: string }> {
+  try {
+    // Tentar obter localização automaticamente
+    const position = await getCurrentPosition();
+    return formatCoordinates(
+      position.coords.latitude,
+      position.coords.longitude
+    );
+  } catch (error) {
+    console.warn('Não foi possível obter localização automaticamente:', error);
+    
+    // Solicitar coordenadas manualmente
+    const latitude = prompt('Digite a latitude (-90 a 90):');
+    const longitude = prompt('Digite a longitude (-180 a 180):');
+    
+    if (!latitude || !longitude) {
+      throw new Error('Coordenadas são obrigatórias');
+    }
+    
+    // Validar coordenadas
+    const validation = validateCoordinates(latitude, longitude);
+    if (!validation.isValid) {
+      throw new Error(validation.errors.join(', '));
+    }
+    
+    return { latitude, longitude };
+  }
+}
+
+/**
+ * Cria um resíduo com obtenção automática de coordenadas
+ */
+export async function createWasteWithLocation(
+  wasteData: CreateWasteRequest['waste'], 
+  addressData: Omit<CreateWasteRequest['address'], 'latitude' | 'longitude'>
+): Promise<WasteResponse> {
+  // Obter coordenadas
+  const coordinates = await getCoordinatesWithFallback();
+  
+  // Criar payload completo
+  const payload: CreateWasteRequest = {
+    waste: wasteData,
+    address: {
+      ...addressData,
+      ...coordinates
+    }
+  };
+  
+  return createWaste(payload);
+}
+
+/**
+ * Calcula a distância aproximada entre duas coordenadas (em km)
+ * Usando a fórmula de Haversine
+ */
+export function calculateDistance(
+  lat1: number, lng1: number,
+  lat2: number, lng2: number
+): number {
+  const R = 6371; // Raio da Terra em km
+  const dLat = deg2rad(lat2 - lat1);
+  const dLng = deg2rad(lng2 - lng1);
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+    Math.sin(dLng/2) * Math.sin(dLng/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  const distance = R * c;
+  return distance;
+}
+
+function deg2rad(deg: number): number {
+  return deg * (Math.PI/180);
+}
+
+/**
+ * Ordena resíduos por proximidade a uma coordenada de referência
+ */
+export function sortWastesByDistance(
+  wastes: WasteResponse[],
+  userLat: number,
+  userLng: number
+): (WasteResponse & { distance?: number })[] {
+  return wastes
+    .filter(waste => waste.address?.latitude && waste.address?.longitude)
+    .map(waste => ({
+      ...waste,
+      distance: calculateDistance(
+        userLat, userLng,
+        waste.address!.latitude!,
+        waste.address!.longitude!
+      )
+    }))
+    .sort((a, b) => (a.distance || 0) - (b.distance || 0));
+}

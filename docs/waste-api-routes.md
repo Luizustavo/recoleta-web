@@ -2,6 +2,13 @@
 
 Documentação completa das rotas da API de resíduos para integração com o frontend.
 
+## ⚠️ **ATUALIZAÇÃO IMPORTANTE - Coordenadas Obrigatórias**
+
+A partir da última atualização, **latitude e longitude são OBRIGATÓRIOS** no cadastro de resíduos:
+- 📍 Devem ser enviadas como **STRING** (não number)
+- ✅ Validação automática de limites (lat: -90/+90, lng: -180/+180)
+- 🎯 Necessárias para cálculo de proximidade entre usuários
+
 ## Base URL
 ```
 http://localhost:3004/api
@@ -10,10 +17,31 @@ http://localhost:3004/api
 ## Autenticação
 Todas as rotas protegidas requerem o header de autorização:
 ```
-Authorization: Bearer <JWT_TOKEN>
-```
-
----
+Authorization: Bearer <#### Other Examples Updated (200)
+```javascript
+{
+  "success": true,
+  "message": "Resíduo atualizado com sucesso",
+  "code": "SUCCESS",
+  "data": {
+    "id": "66d9a5b2c8f1234567890abc",
+    "wasteType": "PLASTIC",
+    "weight": 2.5,
+    "quantity": 5,
+    "unit": "UNITS",
+    "condition": "NEW",
+    "hasPackaging": false,
+    "discardDate": "2025-09-15T10:00:00.000Z",
+    "additionalDescription": "Garrafas PET limpas",
+    "images": ["data:image/jpeg;base64,..."],
+    "status": "AVAILABLE",
+    "userId": "66d8f4a2c8f1234567890xyz",
+    "addressId": "66d9a1b2c8f1234567890def",
+    "createdAt": "2025-09-06T12:00:00.000Z",
+    "updatedAt": "2025-09-06T14:30:00.000Z"
+  }
+}
+```---
 
 ## 📋 Lista de Rotas
 
@@ -65,7 +93,9 @@ Authorization: Bearer <JWT_TOKEN>
     "state": "SP",                         // string
     "zipCode": "05435-020",               // string
     "reference": "Próximo ao metrô",       // string (opcional)
-    "main": false                          // boolean (opcional)
+    "main": false,                         // boolean (opcional)
+    "latitude": "-23.5633",               // string OBRIGATÓRIO (formato: "-23.5505")
+    "longitude": "-46.6568"               // string OBRIGATÓRIO (formato: "-46.6333")
   }
 }
 ```
@@ -159,7 +189,9 @@ Authorization: Bearer <JWT_TOKEN>
         "number": "456",
         "city": "São Paulo",
         "state": "SP",
-        "zipCode": "05435-020"
+        "zipCode": "05435-020",
+        "latitude": -23.5633,
+        "longitude": -46.6568
       },
       "user": {
         "id": "66d8f4a2c8f1234567890xyz",
@@ -213,7 +245,9 @@ Authorization: Bearer <JWT_TOKEN>
       "number": "456",
       "city": "São Paulo",
       "state": "SP",
-      "zipCode": "05435-020"
+      "zipCode": "05435-020",
+      "latitude": -23.5633,
+      "longitude": -46.6568
     },
     "user": {
       "id": "66d8f4a2c8f1234567890xyz",
@@ -353,7 +387,88 @@ Authorization: Bearer <JWT_TOKEN>
 
 ### JavaScript/TypeScript
 
-#### 1. Criar Resíduo
+#### 1. Criar Resíduo (com Coordenadas)
+```javascript
+const createWasteWithLocation = async (wasteData, addressData, token) => {
+  try {
+    // Obter localização atual do usuário
+    const position = await getCurrentPosition();
+    
+    // Preparar dados do endereço com coordenadas obrigatórias
+    const addressWithCoordinates = {
+      ...addressData,
+      latitude: position.coords.latitude.toString(),   // Converter para string
+      longitude: position.coords.longitude.toString()  // Converter para string
+    };
+
+    const response = await fetch('/api/waste', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        waste: wasteData,
+        address: addressWithCoordinates
+      })
+    });
+
+    const result = await response.json();
+    
+    if (result.success) {
+      console.log('Resíduo criado:', result.data);
+      return result.data;
+    } else {
+      throw new Error(result.message);
+    }
+  } catch (error) {
+    console.error('Erro ao criar resíduo:', error);
+    throw error;
+  }
+};
+
+// Função auxiliar para obter localização
+const getCurrentPosition = () => {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error('Geolocalização não suportada'));
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => resolve(position),
+      (error) => reject(error),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
+    );
+  });
+};
+
+// Exemplo de uso
+const wasteData = {
+  wasteType: 'ELECTRONICS',
+  weight: 2.5,
+  quantity: 1,
+  unit: 'KG',
+  condition: 'USED',
+  hasPackaging: true,
+  discardDate: new Date().toISOString(),
+  additionalDescription: 'Smartphone antigo'
+};
+
+const addressData = {
+  street: 'Rua das Flores',
+  number: '123',
+  neighborhood: 'Centro',
+  city: 'São Paulo',
+  state: 'SP',
+  zipCode: '01234-567'
+  // latitude e longitude serão adicionadas automaticamente
+};
+
+createWasteWithLocation(wasteData, addressData, userToken);
+```
+
+#### 2. Criar Resíduo (Método Tradicional)
 ```javascript
 const createWaste = async (wasteData, addressData, token) => {
   try {
@@ -384,7 +499,7 @@ const createWaste = async (wasteData, addressData, token) => {
 };
 ```
 
-#### 2. Buscar Resíduos Disponíveis
+#### 3. Buscar Resíduos Disponíveis
 ```javascript
 const getAvailableWastes = async (filters = {}) => {
   try {
@@ -523,6 +638,8 @@ export interface CreateWasteRequest {
     zipCode: string;
     reference?: string;
     main?: boolean;
+    latitude: string;    // OBRIGATÓRIO: coordenada como string (ex: "-23.5505")
+    longitude: string;   // OBRIGATÓRIO: coordenada como string (ex: "-46.6333")
   };
 }
 
@@ -562,6 +679,217 @@ export interface ApiResponse<T = any> {
 
 ---
 
+## 🌍 Coordenadas Obrigatórias - Informações Importantes
+
+### **Formato das Coordenadas**
+- ✅ **Tipo**: `string` (não `number`)
+- ✅ **Latitude**: Entre -90 e +90 (exemplo: `"-23.5505"`)  
+- ✅ **Longitude**: Entre -180 e +180 (exemplo: `"-46.6333"`)
+- ⚠️ **Validação**: Automática pela API com mensagens de erro específicas
+
+### **Exemplos de Coordenadas Válidas**
+```javascript
+// São Paulo
+"latitude": "-23.5505",
+"longitude": "-46.6333"
+
+// Rio de Janeiro  
+"latitude": "-22.9068", 
+"longitude": "-43.1729"
+
+// Belo Horizonte
+"latitude": "-19.9167",
+"longitude": "-43.9345"
+```
+
+### **Erros de Validação de Coordenadas**
+```javascript
+// Latitude fora dos limites
+{
+  "statusCode": 400,
+  "message": ["Latitude must be a valid number between -90 and 90"],
+  "error": "Bad Request"
+}
+
+// Longitude fora dos limites  
+{
+  "statusCode": 400,
+  "message": ["Longitude must be a valid number between -180 and 180"],
+  "error": "Bad Request"
+}
+
+// Formato inválido
+{
+  "statusCode": 400,
+  "message": ["latitude must be a string", "longitude must be a string"],
+  "error": "Bad Request"
+}
+```
+
+### **Como Obter Coordenadas no Frontend**
+```javascript
+// Geolocalização HTML5
+navigator.geolocation.getCurrentPosition((position) => {
+  const latitude = position.coords.latitude.toString();   // Converter para string
+  const longitude = position.coords.longitude.toString(); // Converter para string
+  
+  // Usar nas requisições da API
+  const payload = {
+    address: {
+      // ... outros campos
+      latitude,
+      longitude
+    }
+  };
+});
+```
+
+---
+
+## 🔧 Tratamento de Erros de Coordenadas
+
+### Erros Comuns e Soluções
+
+#### 1. Erro de Validação de Coordenadas
+```json
+{
+  "success": false,
+  "message": "Validation failed",
+  "errors": [
+    {
+      "property": "latitude",
+      "constraints": {
+        "IsCoordinate": "Latitude deve estar entre -90 e 90"
+      }
+    },
+    {
+      "property": "longitude",
+      "constraints": {
+        "IsCoordinate": "Longitude deve estar entre -180 e 180"
+      }
+    }
+  ]
+}
+```
+
+#### 2. Tratamento no Frontend
+```javascript
+const handleCoordinateErrors = (error) => {
+  if (error.message.includes('Validation failed')) {
+    const coordinateErrors = error.errors?.filter(e => 
+      e.property === 'latitude' || e.property === 'longitude'
+    );
+    
+    if (coordinateErrors?.length > 0) {
+      alert('Coordenadas inválidas. Verifique os valores de latitude e longitude.');
+      return;
+    }
+  }
+  
+  // Outros tipos de erro
+  console.error('Erro ao processar resíduo:', error);
+};
+
+// Exemplo de uso
+try {
+  await createWasteWithLocation(wasteData, addressData, token);
+} catch (error) {
+  handleCoordinateErrors(error);
+}
+```
+
+#### 3. Fallback para Coordenadas Manuais
+```javascript
+const getCoordinatesWithFallback = async () => {
+  try {
+    // Tentar obter localização automaticamente
+    const position = await getCurrentPosition();
+    return {
+      latitude: position.coords.latitude.toString(),
+      longitude: position.coords.longitude.toString()
+    };
+  } catch (error) {
+    console.warn('Não foi possível obter localização automaticamente:', error);
+    
+    // Solicitar coordenadas manualmente
+    const latitude = prompt('Digite a latitude (-90 a 90):');
+    const longitude = prompt('Digite a longitude (-180 a 180):');
+    
+    if (!latitude || !longitude) {
+      throw new Error('Coordenadas são obrigatórias');
+    }
+    
+    // Validar formato básico
+    const lat = parseFloat(latitude);
+    const lng = parseFloat(longitude);
+    
+    if (isNaN(lat) || isNaN(lng)) {
+      throw new Error('Coordenadas devem ser números válidos');
+    }
+    
+    if (lat < -90 || lat > 90) {
+      throw new Error('Latitude deve estar entre -90 e 90');
+    }
+    
+    if (lng < -180 || lng > 180) {
+      throw new Error('Longitude deve estar entre -180 e 180');
+    }
+    
+    return {
+      latitude: latitude,
+      longitude: longitude
+    };
+  }
+};
+
+// Uso com fallback
+const addressData = {
+  street: 'Rua das Flores',
+  number: '123',
+  neighborhood: 'Centro',
+  city: 'São Paulo',
+  state: 'SP',
+  zipCode: '01234-567',
+  ...(await getCoordinatesWithFallback())  // Adiciona latitude e longitude
+};
+```
+
+#### 4. Validação de Coordenadas no Cliente
+```javascript
+const validateCoordinates = (latitude, longitude) => {
+  const lat = parseFloat(latitude);
+  const lng = parseFloat(longitude);
+  
+  const errors = [];
+  
+  if (isNaN(lat)) {
+    errors.push('Latitude deve ser um número válido');
+  } else if (lat < -90 || lat > 90) {
+    errors.push('Latitude deve estar entre -90 e 90');
+  }
+  
+  if (isNaN(lng)) {
+    errors.push('Longitude deve ser um número válido');
+  } else if (lng < -180 || lng > 180) {
+    errors.push('Longitude deve estar entre -180 e 180');
+  }
+  
+  return {
+    isValid: errors.length === 0,
+    errors
+  };
+};
+
+// Exemplo de uso
+const { isValid, errors } = validateCoordinates(latitude, longitude);
+if (!isValid) {
+  console.error('Coordenadas inválidas:', errors);
+  // Exibir mensagens de erro para o usuário
+}
+```
+
+---
+
 ## ⚠️ Códigos de Erro Comuns
 
 | Código HTTP | Código API | Descrição |
@@ -582,6 +910,8 @@ export interface ApiResponse<T = any> {
 4. **Validação**: A API valida todos os enums rigorosamente
 5. **Propriedade**: Usuários só podem atualizar/deletar seus próprios resíduos
 6. **Endereços**: Se o endereço não existir, será criado automaticamente
+7. **⭐ Coordenadas**: Latitude e longitude são **OBRIGATÓRIOS** e devem ser enviados como **string**
+8. **🎯 Geolocalização**: As coordenadas são usadas para cálculo de proximidade entre usuários
 
 ---
 
