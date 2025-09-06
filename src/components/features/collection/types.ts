@@ -28,7 +28,7 @@ export interface AvailableWasteResponse {
   discardDate: string;
   additionalDescription?: string;
   distance?: number;
-  user: {
+  user?: {
     id: string;
     name: string;
     email: string;

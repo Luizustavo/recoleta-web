@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RefreshCw, Package, Search } from "lucide-react";
 import { useWasteCollection } from "./hooks/use-waste-collection";
-import FiltersCard from "./components/filters-card";
+import FiltersHeader from "./components/filters-header";
 import WasteCard from "./components/waste-card";
 
 export default function WasteCollectionPage() {
@@ -61,20 +61,17 @@ export default function WasteCollectionPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Sidebar com filtros */}
-        <div className="lg:col-span-1">
-          <FiltersCard
-            filters={filters}
-            onApplyFilters={applyFilters}
-            onClearFilters={clearFilters}
-            loading={loading}
-            hasLocation={!!userLocation}
-          />
-        </div>
+      {/* Filtros inline */}
+      <FiltersHeader
+        filters={filters}
+        onApplyFilters={applyFilters}
+        onClearFilters={clearFilters}
+        loading={loading}
+        hasLocation={!!userLocation}
+      />
 
-        {/* Lista de resíduos */}
-        <div className="lg:col-span-3">
+      {/* Lista de resíduos */}
+      <div>
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {Array.from({ length: 6 }).map((_, index) => (
@@ -152,7 +149,6 @@ export default function WasteCollectionPage() {
               </div>
             </>
           )}
-        </div>
       </div>
     </div>
   );

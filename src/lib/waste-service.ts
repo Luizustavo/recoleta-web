@@ -195,26 +195,59 @@ export class WasteService {
     console.log("Resposta da API getAvailableWastes:", data);
     
     // Handle different possible response structures
-    let items: AvailableWasteResponse[] = [];
+    let rawItems: unknown[] = [];
 
     // Check for nested structure {success: true, data: {items: [...], ...}}
     if (data && typeof data === 'object' && 'success' in data && data.success && 'data' in data) {
       const nestedData = (data as { data: unknown }).data;
       
       if (nestedData && typeof nestedData === 'object' && 'items' in nestedData && Array.isArray((nestedData as { items: unknown }).items)) {
-        items = (nestedData as { items: AvailableWasteResponse[] }).items;
+        rawItems = (nestedData as { items: unknown[] }).items;
       } else if (Array.isArray(nestedData)) {
         // Fallback if nested data is direct array
-        items = nestedData as AvailableWasteResponse[];
+        rawItems = nestedData as unknown[];
       }
     } else if (Array.isArray(data)) {
       // Direct array response
-      items = data as AvailableWasteResponse[];
+      rawItems = data as unknown[];
     } else {
       console.warn('WasteService.getAvailableWastes - Resposta em formato inesperado:', data);
     }
 
+    // Transform raw items to AvailableWasteResponse format
+    const items: AvailableWasteResponse[] = rawItems.map((item) => {
+      const wasteItem = item as Record<string, unknown>;
+      const userObj = wasteItem.user as Record<string, unknown> | undefined;
+      const addressObj = wasteItem.address as Record<string, unknown> | undefined;
+      
+      return {
+        id: String(wasteItem.id || ''),
+        wasteType: String(wasteItem.wasteType || ''),
+        weight: Number(wasteItem.weight || 0),
+        quantity: Number(wasteItem.quantity || 0),
+        condition: String(wasteItem.condition || ''),
+        status: String(wasteItem.status || ''),
+        discardDate: String(wasteItem.discardDate || ''),
+        additionalDescription: wasteItem.additionalDescription ? String(wasteItem.additionalDescription) : undefined,
+        distance: wasteItem.distance ? Number(wasteItem.distance) : undefined,
+        user: userObj ? {
+          id: String(userObj.id || ''),
+          name: String(userObj.name || ''),
+          email: String(userObj.email || '')
+        } : undefined,
+        address: {
+          street: addressObj?.street ? String(addressObj.street) : 'Endereço não disponível',
+          city: addressObj?.city ? String(addressObj.city) : '',
+          state: addressObj?.state ? String(addressObj.state) : '',
+          latitude: addressObj?.latitude ? Number(addressObj.latitude) : undefined,
+          longitude: addressObj?.longitude ? Number(addressObj.longitude) : undefined
+        },
+        images: Array.isArray(wasteItem.images) ? wasteItem.images.map(img => String(img)) : []
+      };
+    });
+
     console.log('WasteService.getAvailableWastes - Dados processados:', items.length, 'items encontrados');
+    console.log('WasteService.getAvailableWastes - Amostra de dados:', items[0]);
     
     return items;
   }

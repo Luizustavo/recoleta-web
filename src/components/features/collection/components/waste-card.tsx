@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -84,17 +85,31 @@ export default function WasteCard({
         </div>
 
         {/* Informações do usuário */}
-        <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-          <Avatar className="h-8 w-8">
-            <AvatarFallback>
-              <User className="h-4 w-4" />
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <p className="font-medium text-sm">{waste.user.name}</p>
-            <p className="text-xs text-muted-foreground">{waste.user.email}</p>
+        {waste.user ? (
+          <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+            <Avatar className="h-8 w-8">
+              <AvatarFallback>
+                <User className="h-4 w-4" />
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="font-medium text-sm">{waste.user.name}</p>
+              <p className="text-xs text-muted-foreground">{waste.user.email}</p>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+            <Avatar className="h-8 w-8">
+              <AvatarFallback>
+                <User className="h-4 w-4" />
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="font-medium text-sm">Usuário não identificado</p>
+              <p className="text-xs text-muted-foreground">Email não disponível</p>
+            </div>
+          </div>
+        )}
       </CardHeader>
 
       <CardContent className="space-y-4 flex-1">
@@ -156,10 +171,12 @@ export default function WasteCard({
             </p>
             <div className="grid grid-cols-4 gap-2">
               {waste.images.slice(0, 4).map((image, index) => (
-                <img
+                <Image
                   key={index}
                   src={image}
                   alt={`Foto ${index + 1}`}
+                  width={64}
+                  height={64}
                   className="w-full h-16 object-cover rounded border"
                 />
               ))}
