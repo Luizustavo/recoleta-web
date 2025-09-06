@@ -25,91 +25,9 @@ import { toast } from "sonner";
 import {
   Upload,
   X,
-  Smartphone,
-  Recycle,
-  FileText,
-  Wine,
-  Wrench,
-  Apple,
-  Shirt,
-  Package,
 } from "lucide-react";
-import { WasteFormData, WasteType, WasteFormProps } from "./types";
-
-const wasteTypes: WasteType[] = [
-  {
-    id: "eletronicos",
-    nome: "Eletrônicos",
-    imagem: "/images/waste/electronic.png",
-    descricao: "Computadores, celulares, TVs, etc.",
-    icon: Smartphone,
-    color: "text-blue-600",
-  },
-  {
-    id: "plasticos",
-    nome: "Plásticos",
-    imagem: "/images/waste/plastic.png",
-    descricao: "Garrafas, embalagens, sacolas, etc.",
-    icon: Recycle,
-    color: "text-yellow-600",
-  },
-  {
-    id: "papel",
-    nome: "Papel",
-    imagem: "/images/waste/paper.png",
-    descricao: "Jornais, revistas, caixas, etc.",
-    icon: FileText,
-    color: "text-orange-600",
-  },
-  {
-    id: "vidros",
-    nome: "Vidros",
-    imagem: "/images/waste/glass.png",
-    descricao: "Garrafas, potes, copos, etc.",
-    icon: Wine,
-    color: "text-green-600",
-  },
-  {
-    id: "metais",
-    nome: "Metais",
-    imagem: "/images/waste/metal.png",
-    descricao: "Latas, panelas, ferragens, etc.",
-    icon: Wrench,
-    color: "text-gray-600",
-  },
-  {
-    id: "organicos",
-    nome: "Orgânicos",
-    imagem: "/images/waste/organic.png",
-    descricao: "Restos de comida, cascas, etc.",
-    icon: Apple,
-    color: "text-green-700",
-  },
-  {
-    id: "perigosos",
-    nome: "Perigosos",
-    imagem: "/images/waste/dangerous.png",
-    descricao: "Baterias, tintas, produtos químicos, etc.",
-    icon: Package,
-    color: "text-red-600",
-  },
-  {
-    id: "texteis",
-    nome: "Têxteis",
-    imagem: "/images/waste/textile.png",
-    descricao: "Roupas, tecidos, calçados, etc.",
-    icon: Shirt,
-    color: "text-purple-600",
-  },
-  {
-    id: "mistos",
-    nome: "Mistos",
-    imagem: "/images/waste/misc.png",
-    descricao: "Outros tipos de resíduos.",
-    icon: Package,
-    color: "text-indigo-600",
-  },
-];
+import { WasteFormData, WasteFormProps } from "./types";
+import { wasteTypes } from "./utils";
 
 export default function WasteForm({ onNext, initialData }: WasteFormProps) {
   const [formData, setFormData] = useState<WasteFormData>(
