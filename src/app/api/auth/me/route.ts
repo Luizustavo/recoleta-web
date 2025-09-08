@@ -17,7 +17,7 @@ export async function GET() {
     }
 
     // Validar token diretamente com o backend
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3004";
+    const backendUrl = process.env.API_URL || "http://localhost:3004";
     console.log("ME - Validating token with backend:", `${backendUrl}/api/auth/validate`);
     
     const response = await fetch(`${backendUrl}/api/auth/validate`, {

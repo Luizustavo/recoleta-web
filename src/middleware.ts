@@ -19,7 +19,7 @@ async function isAuthenticated(request: NextRequest): Promise<boolean> {
     console.log("Middleware - Validating token via backend...");
     
     // Chamar o backend diretamente para validar o token
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3004";
+    const backendUrl = process.env.API_URL || "http://localhost:3004";
     const response = await fetch(`${backendUrl}/api/auth/validate`, {
       method: "GET",
       headers: {
@@ -36,8 +36,8 @@ async function isAuthenticated(request: NextRequest): Promise<boolean> {
     const result = await response.json();
     console.log("Middleware - Backend validation result:", result);
     
-    // Verificar o formato de resposta do backend: {success: true, data: {valid: true}}
-    return result.success === true && result.data?.valid === true;
+    // Verificar o formato de resposta do backend conforme a documentação
+    return result.success && result.data?.valid === true;
   } catch (error) {
     console.error('Erro ao validar token no middleware:', error);
     return false;
