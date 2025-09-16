@@ -55,6 +55,10 @@ const data = {
           title: "Coletar Resíduo",
           url: "/waste-collection",
         },
+        {
+          title: "Minhas Coletas",
+          url: "/my-collections",
+        },
       ],
     },
     {

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { WasteService } from "@/lib/waste-service";
-import { CollectionFilters, AvailableWasteResponse, CollectionRequestData } from "../types";
+import { CollectionFilters, AvailableWasteResponse } from "../types";
 import { toast } from "sonner";
 
 export function useWasteCollection() {
@@ -113,10 +113,10 @@ export function useWasteCollection() {
     }
   }, [filters, userLocation]);
 
-  const requestCollection = useCallback(async (wasteId: string, data?: CollectionRequestData) => {
+  const requestCollection = useCallback(async (wasteId: string) => {
     setCollectingId(wasteId);
     try {
-      const result = await WasteService.requestCollection(wasteId, data);
+      const result = await WasteService.requestCollection(wasteId);
       
       if (result.success) {
         toast.success(result.message || "Solicitação de coleta enviada com sucesso!");
