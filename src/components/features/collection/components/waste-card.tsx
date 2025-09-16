@@ -8,6 +8,7 @@ import { CalendarDays, MapPin, User, Weight, Package, Loader2, Navigation, HandH
 import { AvailableWasteResponse } from "../types";
 import { wasteTypes } from "../../discard/waste-form/utils";
 import { formatDate } from "../../discard/summary-form/utils";
+import { translateWasteType } from "@/lib/waste-type-translator";
 
 interface WasteCardProps {
   waste: AvailableWasteResponse;
@@ -52,7 +53,7 @@ export default function WasteCard({
         <div className="flex items-center gap-3">
           <IconComponent className={`h-8 w-8 ${wasteType?.color || 'text-gray-600'}`} />
           <div className="flex-1">
-            <h3 className="text-lg font-semibold">{wasteType?.nome || waste.wasteType}</h3>
+            <h3 className="text-lg font-semibold">{wasteType?.nome || translateWasteType(waste.wasteType)}</h3>
             <p className="text-sm text-muted-foreground">{wasteType?.descricao}</p>
           </div>
           {waste.distance && (

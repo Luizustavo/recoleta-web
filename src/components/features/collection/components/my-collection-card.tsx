@@ -15,6 +15,7 @@ import {
   getWasteSummary,
   getAddressSummary
 } from "@/lib/collection-api-utils";
+import { translateWasteType } from "@/lib/waste-type-translator";
 
 interface MyCollectionCardProps {
   collection: CollectionResponse;
@@ -54,7 +55,7 @@ export default function MyCollectionCard({
           <Package className="h-8 w-8 text-primary" />
           <div className="flex-1">
             <h3 className="text-lg font-semibold">
-              {waste.wasteType.replace('_', ' ')}
+              {translateWasteType(waste.wasteType)}
             </h3>
             <p className="text-sm text-muted-foreground">{wasteSummary}</p>
           </div>
