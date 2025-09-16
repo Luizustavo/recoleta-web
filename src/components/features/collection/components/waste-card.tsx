@@ -1,21 +1,18 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { CalendarDays, MapPin, User, Weight, Package, Loader2, MessageSquare, Navigation } from "lucide-react";
+import { CalendarDays, MapPin, User, Weight, Package, Loader2, Navigation, HandHeart } from "lucide-react";
 import { AvailableWasteResponse } from "../types";
 import { wasteTypes } from "../../discard/waste-form/utils";
 import { formatDate } from "../../discard/summary-form/utils";
+import { translateWasteType } from "@/lib/waste-type-translator";
 
 interface WasteCardProps {
   waste: AvailableWasteResponse;
-  onRequestCollection: (wasteId: string, data?: { message?: string }) => Promise<{ success: boolean; message: string }>;
+  onRequestCollection: (wasteId: string) => Promise<{ success: boolean; message: string }>;
   isCollecting: boolean;
 }
 
@@ -37,32 +34,15 @@ export default function WasteCard({
   onRequestCollection, 
   isCollecting 
 }: WasteCardProps) {
-  const [showMessageForm, setShowMessageForm] = useState(false);
-  const [message, setMessage] = useState("");
-
   const frontendWasteType = wasteTypeMapping[waste.wasteType] || 'mistos';
   const wasteType = wasteTypes.find(type => type.id === frontendWasteType);
   const IconComponent = wasteType?.icon || Package;
 
   const handleCollect = async () => {
     try {
-      if (showMessageForm) {
-        await onRequestCollection(waste.id, { message: message.trim() || undefined });
-        setMessage("");
-        setShowMessageForm(false);
-      } else {
-        setShowMessageForm(true);
-      }
-    } catch (error) {
-      console.error("Erro ao solicitar coleta:", error);
-    }
-  };
-
-  const handleQuickCollect = async () => {
-    try {
       await onRequestCollection(waste.id);
     } catch (error) {
-      console.error("Erro ao solicitar coleta:", error);
+      console.error("Erro ao assinar coleta:", error);
     }
   };
 
@@ -73,7 +53,7 @@ export default function WasteCard({
         <div className="flex items-center gap-3">
           <IconComponent className={`h-8 w-8 ${wasteType?.color || 'text-gray-600'}`} />
           <div className="flex-1">
-            <h3 className="text-lg font-semibold">{wasteType?.nome || waste.wasteType}</h3>
+            <h3 className="text-lg font-semibold">{wasteType?.nome || translateWasteType(waste.wasteType)}</h3>
             <p className="text-sm text-muted-foreground">{wasteType?.descricao}</p>
           </div>
           {waste.distance && (
@@ -87,11 +67,9 @@ export default function WasteCard({
         {/* Informações do usuário */}
         {waste.user ? (
           <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-            <Avatar className="h-8 w-8">
-              <AvatarFallback>
-                <User className="h-4 w-4" />
-              </AvatarFallback>
-            </Avatar>
+            <div className="h-8 w-8 bg-primary/10 rounded-full flex items-center justify-center">
+              <User className="h-4 w-4 text-primary" />
+            </div>
             <div>
               <p className="font-medium text-sm">{waste.user.name}</p>
               <p className="text-xs text-muted-foreground">{waste.user.email}</p>
@@ -99,11 +77,9 @@ export default function WasteCard({
           </div>
         ) : (
           <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-            <Avatar className="h-8 w-8">
-              <AvatarFallback>
-                <User className="h-4 w-4" />
-              </AvatarFallback>
-            </Avatar>
+            <div className="h-8 w-8 bg-muted rounded-full flex items-center justify-center">
+              <User className="h-4 w-4 text-muted-foreground" />
+            </div>
             <div>
               <p className="font-medium text-sm">Usuário não identificado</p>
               <p className="text-xs text-muted-foreground">Email não disponível</p>
@@ -191,73 +167,27 @@ export default function WasteCard({
           </div>
         )}
 
-        {/* Formulário de mensagem */}
-        {showMessageForm && (
-          <div className="space-y-2 pt-2 border-t">
-            <Label htmlFor="collection-message">Mensagem (opcional)</Label>
-            <Textarea
-              id="collection-message"
-              placeholder="Ex: Posso coletar hoje à tarde. Tenho experiência com reciclagem..."
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              className="min-h-[80px]"
-            />
-          </div>
-        )}
       </CardContent>
 
-      <CardFooter className="space-y-2">
-        {!showMessageForm ? (
-          <div className="flex gap-2 w-full">
-            <Button 
-              onClick={handleQuickCollect} 
-              disabled={isCollecting}
-              variant="outline"
-              className="flex-1"
-            >
-              {isCollecting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Solicitando...
-                </>
-              ) : (
-                "Coleta Rápida"
-              )}
-            </Button>
-            <Button 
-              onClick={handleCollect} 
-              disabled={isCollecting}
-              className="flex-1"
-            >
-              <MessageSquare className="mr-2 h-4 w-4" />
-              Com Mensagem
-            </Button>
-          </div>
-        ) : (
-          <div className="flex gap-2 w-full">
-            <Button 
-              onClick={() => setShowMessageForm(false)} 
-              variant="outline"
-              className="flex-1"
-            >
-              Cancelar
-            </Button>
-            <Button 
-              onClick={handleCollect} 
-              disabled={isCollecting}
-              className="flex-1"
-            >
-              {isCollecting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Enviando...
-                </>
-              ) : (
-                "Solicitar Coleta"
-              )}
-            </Button>
-          </div>
-        )}
+      <CardFooter>
+        <Button 
+          onClick={handleCollect} 
+          disabled={isCollecting}
+          className="w-full"
+          size="lg"
+        >
+          {isCollecting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Assinando Coleta...
+            </>
+          ) : (
+            <>
+              <HandHeart className="mr-2 h-4 w-4" />
+              Assinar Coleta
+            </>
+          )}
+        </Button>
       </CardFooter>
     </Card>
   );

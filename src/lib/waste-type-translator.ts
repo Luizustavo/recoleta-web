@@ -1,5 +1,31 @@
-// Mapeamento de tipos de resíduo em inglês para português
+import { WasteType } from "@/types/waste-api";
+
+// Mapeamento direto dos enums da API para português
+const apiWasteTypeTranslations: Record<WasteType, string> = {
+  [WasteType.ELECTRONICS]: "Eletrônicos",
+  [WasteType.ORGANIC]: "Orgânico",
+  [WasteType.PLASTIC]: "Plástico", 
+  [WasteType.PAPER]: "Papel",
+  [WasteType.GLASS]: "Vidro",
+  [WasteType.METAL]: "Metal",
+  [WasteType.WOOD]: "Madeira",
+  [WasteType.TEXTILE]: "Têxtil",
+  [WasteType.MISCELLANEOUS]: "Diversos"
+};
+
+// Mapeamento de tipos de resíduo em inglês para português (compatibilidade)
 const wasteTypeTranslations: Record<string, string> = {
+  // Enums da API
+  "ELECTRONICS": "Eletrônicos",
+  "ORGANIC": "Orgânico", 
+  "PLASTIC": "Plástico",
+  "PAPER": "Papel",
+  "GLASS": "Vidro",
+  "METAL": "Metal",
+  "WOOD": "Madeira",
+  "TEXTILE": "Têxtil",
+  "MISCELLANEOUS": "Diversos",
+  
   // Eletrônicos
   "electronics": "Eletrônicos",
   "electronic": "Eletrônico",
@@ -90,10 +116,27 @@ const wasteTypeTranslations: Record<string, string> = {
   "wood": "Madeira"
 };
 
+/**
+ * Traduz um tipo de resíduo da API para português
+ * Função principal para usar com enums da API
+ */
+export function translateWasteTypeFromAPI(wasteType: WasteType): string {
+  return apiWasteTypeTranslations[wasteType];
+}
+
+/**
+ * Traduz um tipo de resíduo (compatibilidade)
+ * Para uso com strings genéricas
+ */
 export function translateWasteType(wasteType: string): string {
   // Se já estiver em português, retorna como está
   if (/[áàâãéèêíìîóòôõúùû]/i.test(wasteType)) {
     return wasteType;
+  }
+  
+  // Primeiro tenta busca direta (para enums da API)
+  if (wasteTypeTranslations[wasteType]) {
+    return wasteTypeTranslations[wasteType];
   }
   
   // Converte para lowercase e remove espaços/underscores para busca

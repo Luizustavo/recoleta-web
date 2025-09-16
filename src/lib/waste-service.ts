@@ -1,6 +1,6 @@
 import { WasteFormData } from "@/components/features/discard/waste-form/types";
 import { AddressData } from "@/components/features/discard/address-form/types";
-import { AvailableWasteResponse, CollectionFilters, CollectionRequestData, CollectionRequestResult } from "@/components/features/collection/types";
+import { AvailableWasteResponse, CollectionFilters, CollectionRequestResult } from "@/components/features/collection/types";
 import { WasteResponse } from "@/types/waste-api";
 import { handleFormSubmission } from "@/lib/waste-form-adapter";
 import { fetchWrapper } from "@/lib/fetch-wrapper";
@@ -252,23 +252,28 @@ export class WasteService {
     return items;
   }
 
-  static async requestCollection(wasteId: string, data?: CollectionRequestData): Promise<CollectionRequestResult> {
-    const response = await fetch(`/api/waste/${wasteId}/collect`, {
+  static async requestCollection(wasteId: string): Promise<CollectionRequestResult> {
+    const response = await fetch(`/api/collection`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(data || {}),
+      body: JSON.stringify({ wasteId }),
     });
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(
-        errorData.error ||
-          `Erro ao solicitar coleta: ${response.status} ${response.statusText}`
+        errorData.message || errorData.error ||
+          `Erro ao assinar coleta: ${response.status} ${response.statusText}`
       );
     }
 
-    return await response.json();
+    const result = await response.json();
+    
+    return {
+      success: result.success || false,
+      message: result.message || 'Coleta assinada com sucesso'
+    };
   }
 }
