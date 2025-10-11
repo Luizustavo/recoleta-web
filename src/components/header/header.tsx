@@ -5,7 +5,8 @@ import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
 export function Header() {
   const navTitles = [
-    { title: "Notícias", href: "https://recoleta-news.vercel.app/" },
+    { title: "Home", href: "/home" },
+    { title: "Notícias", href: "/news" },
     { title: "Sobre nós", href: "#" },
     { title: "Nosso impacto", href: "#" },
     { title: "Parceiros", href: "#" },
