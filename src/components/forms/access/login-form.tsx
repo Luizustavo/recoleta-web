@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import { useAuth } from "@/context/auth-context";
 import { useRouter } from "next/navigation";
+import { signIn as socialSignIn } from "next-auth/react";
 
 interface LoginFormProps {
   onToggle: () => void;
@@ -52,7 +53,6 @@ export default function LoginForm({ onToggle }: LoginFormProps) {
 
   async function onSubmit(payload: Schema) {
     setIsLoading(true);
-    
     try {
       const authorized = await signIn(payload);
 
@@ -61,14 +61,14 @@ export default function LoginForm({ onToggle }: LoginFormProps) {
           description: "Redirecionando para o dashboard...",
           duration: 2000,
         });
-        
         setTimeout(() => {
           router.push("/dashboard");
           router.refresh();
         }, 1000);
       } else {
         toast.error("Falha no login", {
-          description: "Email ou senha incorretos. Verifique suas credenciais e tente novamente.",
+          description:
+            "Email ou senha incorretos. Verifique suas credenciais e tente novamente.",
         });
       }
     } catch (error) {
@@ -143,11 +143,7 @@ export default function LoginForm({ onToggle }: LoginFormProps) {
               </FormItem>
             )}
           />
-          <Button 
-            type="submit" 
-            disabled={isLoading}
-            className="w-full"
-          >
+          <Button type="submit" disabled={isLoading} className="w-full">
             {isLoading ? "Entrando..." : "Login"}
           </Button>
           <span className="flex items-center justify-center gap-4">
@@ -161,7 +157,9 @@ export default function LoginForm({ onToggle }: LoginFormProps) {
                 type="button"
                 variant="outline"
                 className="flex gap-3 text-sm"
-                /*  onClick={() => signIn("google", { callbackUrl: "/dashboard" })} */
+                onClick={() =>
+                  socialSignIn("google", { callbackUrl: "/dashboard" })
+                }
               >
                 <Image
                   src="/images/icon-google.svg"
@@ -172,14 +170,12 @@ export default function LoginForm({ onToggle }: LoginFormProps) {
                 Entrar com Google
               </Button>
             </div>
-            <div>
+            {/*<div>
               <Button
                 type="button"
                 variant="outline"
                 className="flex gap-3 text-sm"
-                /*   onClick={() =>
-                  signIn("facebook", { callbackUrl: "/dashboard" })
-                } */
+                onClick={() => signInWithFacebook()}
               >
                 <Image
                   src="/images/icon-facebook.svg"
@@ -189,7 +185,7 @@ export default function LoginForm({ onToggle }: LoginFormProps) {
                 />
                 Entrar com Facebook
               </Button>
-            </div>
+            </div>*/}
           </section>
           <span className="flex justify-center">
             <h1 className="mt-4">
