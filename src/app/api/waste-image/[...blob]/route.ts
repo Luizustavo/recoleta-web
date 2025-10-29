@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 const BACKEND_URL = process.env.API_URL ;
 
-export async function GET(req: NextRequest, { params }: { params: { blob: string[] } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ blob: string[] }> }) {
   try {
-    const blobPath = params.blob.join("/"); 
+    const { blob } = await params;
+    const blobPath = blob.join("/"); 
 
     const backendUrl = `${BACKEND_URL}/api/waste-image/${blobPath}`;
 
