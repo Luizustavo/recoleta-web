@@ -32,7 +32,7 @@ export function WasteImagesCard({ waste, onImageSelect }: WasteImagesCardProps) 
               onClick={() => onImageSelect(index)}
             >
               <Image
-                src={`data:image/jpeg;base64,${image}`}
+                src={image}
                 alt={`Foto ${index + 1} do resíduo`}
                 width={120}
                 height={96}
