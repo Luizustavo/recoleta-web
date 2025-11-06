@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -77,7 +78,7 @@ export default function WasteForm({ onNext, initialData }: WasteFormProps) {
     return new Promise((resolve, reject) => {
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
-      const img = new Image();
+      const img = document.createElement("img");
 
       img.onload = () => {
         const maxWidth = 800;
@@ -513,13 +514,14 @@ export default function WasteForm({ onNext, initialData }: WasteFormProps) {
                     {selectedImages.length}/5 imagem(ns) selecionada(s) -
                     Otimização automática aplicada
                   </p>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-3 gap-4">
                     {selectedImages.map((image, index) => (
-                      <div key={index} className="relative">
-                        <img
+                      <div key={index} className="relative w-full h-24">
+                        <Image
                           src={URL.createObjectURL(image)}
                           alt={`Preview ${index + 1}`}
-                          className="w-full h-24 object-cover rounded-lg"
+                          fill
+                          className="object-cover rounded-lg"
                         />
                         <Button
                           type="button"

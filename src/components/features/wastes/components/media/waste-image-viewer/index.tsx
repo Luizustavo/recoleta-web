@@ -80,7 +80,7 @@ export function WasteImageViewer({
 
           <div className="relative w-full h-[70vh]">
             <Image
-              src={`data:image/jpeg;base64,${images[selectedIndex]}`}
+              src={images[selectedIndex]}
               alt={`Foto ${selectedIndex + 1} do resíduo`}
               fill
               className="object-contain"
