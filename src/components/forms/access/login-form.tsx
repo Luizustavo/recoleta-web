@@ -158,7 +158,7 @@ export default function LoginForm({ onToggle }: LoginFormProps) {
                 variant="outline"
                 className="flex gap-3 text-sm"
                 onClick={() =>
-                  socialSignIn("google", { callbackUrl: "/dashboard" })
+                  socialSignIn("google", { callbackUrl: "/api/auth/callback" })
                 }
               >
                 <Image

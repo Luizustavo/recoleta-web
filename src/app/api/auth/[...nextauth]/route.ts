@@ -3,11 +3,22 @@ import GoogleProvider from "next-auth/providers/google";
 import FacebookProvider from "next-auth/providers/facebook";
 import { CredentialInput } from "next-auth/providers/credentials";
 
-// Extend Session type to include accessToken
+// Extend Session type to include accessToken and backendToken
 declare module "next-auth" {
   interface Session {
     accessToken?: string;
+    backendToken?: string;
   }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    backendToken?: string;
+  }
+}
+
+interface ExtendedAccount extends Account {
+  backendToken?: string;
 }
 
 const {
@@ -16,8 +27,12 @@ const {
   FACEBOOK_CLIENT_ID,
   FACEBOOK_CLIENT_SECRET,
   NEXTAUTH_SECRET,
-  NEXT_PUBLIC_API_URL, // your backend base URL
+  API_URL, // your backend base URL
 } = process.env;
+
+console.log('GOOGLE_CLIENT_ID', GOOGLE_CLIENT_ID)
+console.log('GOOGLE_CLIENT_SECRET', GOOGLE_CLIENT_SECRET)
+
 
 export const authOptions = {
   secret: NEXTAUTH_SECRET,
@@ -59,7 +74,7 @@ export const authOptions = {
         return false;
       }
 
-      const backendUrl = `${NEXT_PUBLIC_API_URL}/api/auth/${providerRoute}`;
+      const backendUrl = `${API_URL}/api/auth/${providerRoute}`;
 
       // Send the OAuth token to your backend to log in or register the user
       try {
@@ -77,8 +92,10 @@ export const authOptions = {
         const data = await response.json();
         console.log(`✅ ${providerRoute} login synced with backend:`, data);
 
-        // Optionally store backend JWT in cookie here
-        // e.g., cookies().set("recoleta_access_token", data.token);
+        // Store backend JWT token in the account object so it can be accessed in jwt callback
+        if (data.access_token) {
+          account.backendToken = data.access_token;
+        }
 
         return true;
       } catch (err) {
@@ -93,7 +110,12 @@ export const authOptions = {
       token: import("next-auth/jwt").JWT;
       account: Account | null;
     }) {
-      if (account) token.accessToken = account.access_token;
+      if (account) {
+        token.accessToken = account.access_token;
+        // Store the backend JWT token
+        const extendedAccount = account as ExtendedAccount;
+        token.backendToken = extendedAccount.backendToken;
+      }
       return token;
     },
 
@@ -106,6 +128,9 @@ export const authOptions = {
     }) {
       session.accessToken =
         typeof token.accessToken === "string" ? token.accessToken : undefined;
+      // Add backend token to session
+      session.backendToken =
+        typeof token.backendToken === "string" ? token.backendToken : undefined;
       return session;
     },
   },
