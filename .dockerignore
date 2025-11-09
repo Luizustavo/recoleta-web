@@ -1,0 +1,15 @@
+node_modules
+.next
+.pnpm-store
+.git
+.github
+.vscode
+dist
+.env
+.env.local
+.env.*
+pnpm-lock.yaml
+docker-compose.yml
+Dockerfile
+*.log
+.DS_Store

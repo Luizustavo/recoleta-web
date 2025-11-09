@@ -194,39 +194,5 @@ Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalh
 
 ---
 
-<div align="center">
-  <p>Feito com ❤️ e ♻️ pensando em um futuro mais sustentável</p>
-</div>
-
-## 🧭 Build de imagem sem Docker local (CI)
-
-Se você não pode instalar Docker na sua máquina (sem acesso admin), é possível gerar a imagem usando GitHub Actions e publicar no GitHub Container Registry (GHCR). Neste repositório há um workflow de exemplo em `.github/workflows/ci-docker-publish.yml` que constrói a imagem e a publica em `ghcr.io`.
-
-Como funciona (fluxo resumido):
-
-1. Faça push para a branch `main` (ou dispare o workflow manualmente pela aba "Actions").
-2. O workflow executa em uma runner do GitHub, constrói a imagem com o `Dockerfile` e publica em `ghcr.io/<OWNER>/recoleta-web:latest`.
-
-Como usar a imagem publicada (em outra máquina com Docker):
-
-```pwsh
-# Exemplo: puxar imagem do GHCR
-docker pull ghcr.io/<OWNER>/recoleta-web:latest
-
-# Rodar
-docker run -it --rm -p 3000:3000 ghcr.io/<OWNER>/recoleta-web:latest
-```
-
-Observações:
-- O workflow usa `GITHUB_TOKEN` para autenticar no GHCR, então não é obrigatório criar secrets para publicar na mesma conta/organização do repositório.
-- Se você prefere outro registry (Docker Hub, AWS ECR, Azure ACR), eu posso adaptar o workflow e indicar os secrets necessários.
-
-## ☁️ Alternativas para desenvolvimento sem Docker local
-
-- GitHub Codespaces: abre um ambiente remoto (container) pronto para desenvolvimento. Requer que sua conta/organização tenha acesso ao Codespaces.
-- Gitpod: abra `https://gitpod.io/#https://github.com/<OWNER>/recoleta-web` para criar um workspace na nuvem com ferramentas pré-instaladas.
-
-Se quiser, eu posso:
-- Ajustar o workflow para publicar em outro registry.
-- Criar um arquivo `.gitpod.yml` para facilitar abrir o projeto no Gitpod.
-- Gerar instruções para rodar o app em um ambiente remoto (ex.: VPS) se você tiver um host disponível.
+<!-- Center the text using HTML comments -->
+Feito com ❤️ e ♻️ pensando em um futuro mais sustentável
