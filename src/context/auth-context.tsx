@@ -1,11 +1,13 @@
 "use client";
+
+import { signIn as nextAuthSignIn } from "next-auth/react";
 import React, { createContext, useContext, ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { AccessType, AuthCoxtextData, RegisterType } from "@/types/auth-type";
+import { AccessType, AuthContextData, RegisterType } from "@/types/auth-type";
 
-const AuthContext = createContext<AuthCoxtextData | undefined>(undefined);
+const AuthContext = createContext<AuthContextData | undefined>(undefined);
 
-export const useAuth = (): AuthCoxtextData => {
+export const useAuth = (): AuthContextData => {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error("useAuth precisa ser usado dentro de um AuthProvider");
@@ -71,8 +73,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         method: "DELETE",
         headers: {
           "Cache-Control": "no-cache, no-store, must-revalidate",
-          "Pragma": "no-cache",
-          "Expires": "0",
+          Pragma: "no-cache",
+          Expires: "0",
         },
       });
 
@@ -88,10 +90,59 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const value: AuthCoxtextData = {
+  // --- NEW: Google Login ---
+  const signInWithGoogle = async (): Promise<void> => {
+    try {
+      const response = await fetch("/api/auth/google", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!response.ok) throw new Error("Falha na autenticação com Google!");
+
+      const data = await response.json();
+      console.log("Google login response:", data);
+      // Trigger NextAuth Google OAuth flow
+      await nextAuthSignIn("google", {
+        callbackUrl: "/dashboard", // redirect after successful login
+      });
+
+      // No need to handle token manually; NextAuth sets session cookies
+      console.log("Google sign-in triggered");
+    } catch (error) {
+      console.error("Erro no login com Google:", error);
+    }
+  };
+
+  // --- NEW: Facebook Login ---
+  const signInWithFacebook = async () => {
+    try {
+      const response = await fetch("/api/auth/facebook", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!response.ok) throw new Error("Falha na autenticação com Facebook");
+
+      const data = await response.json();
+      console.log("Facebook login response:", data);
+
+      localStorage.setItem("token", data.access_token);
+
+      router.push("/dashboard");
+      return true;
+    } catch (error) {
+      console.error("Erro no login com Facebook:", error);
+      return false;
+    }
+  };
+
+  const value: AuthContextData = {
     signIn,
     signUp,
     signOut,
+    signInWithGoogle,
+    signInWithFacebook,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
