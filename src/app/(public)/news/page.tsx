@@ -1,67 +1,74 @@
+
 "use client";
 
 import { Header } from "@/components/header/header";
-import { Button } from "@/components/ui/button";
-export default function Home() {
-  return (
-    <main className="grid grid-rows-3 bg-black relative h-screen">
-      <figure className="absolute top-0 left-0 w-full h-full">
-        <video
-          aria-label="Video demonstrando a natureza"
-          src="/videos/preguica-floresta.mp4"
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="size-full object-cover"
-          preload="metadata"
-        ></video>
-        <figcaption className="sr-only">
-          Vídeo ilustrativo da natureza
-        </figcaption>
-      </figure>
-      <Header />
-      <section className="relative z-10 text-white grid grid-cols-4 items-center sm:items-end px-10">
-        <h1
-          className="text-2xl sm:text-6xl font-bold col-span-4 sm:col-span-2"
-          style={{ textShadow: "1px 2px 4px rgba(0, 0, 0, 0.7)" }}
-        >
-          PAGINA DE NOTICIAS EM CONSTRUÇÃO
-        </h1>
-      </section>
-      <section
-        className="relative z-10 text-white grid grid-cols-5 px-10 mt-4"
-        aria-labelledby="cta-section"
-      >
-        <span className="col-span-4 sm:col-span-2">
-          <p
-            id="cta-section"
-            className="sm:text-2xl"
-            style={{ textShadow: "1px 2px 4px rgba(0, 0, 0, 0.7)" }}
-            role="doc-subtitle"
-          >
-            Junte-se a nós na maneira mais inovadora de salvar o planeta.
-            Registre-se agora e faça parte da mudança!
-          </p>
+import useMockedNews, { NewsItem } from "@/hooks/use-mocked-news";
+import useGNews from "@/hooks/use-gnews";
+import NewsCarousel from "@/components/features/news/news-carousel";
+import NewsCard from "@/components/features/news/news-card";
 
-          <nav className="mt-6 flex gap-4" aria-label="Ações principais">
-            <Button 
-              className="bg-white text-green-800 border border-green-800 font-bold p-5 focus:ring-2 focus:ring-green-900 focus:ring-offset-2 transition-colors"
-              //onClick={() => router.push("/login?loginComponent=false")}
-              aria-label="Ir para página de cadastro"
-            >
-              Cadastre-se
-            </Button>
-            <Button
-              variant="default"
-              className="bg-transparent text-white border-white border font-bold p-5 focus:ring-2 focus:ring-white focus:ring-offset-2 transition-colors"
-              aria-label="Saiba como apoiar nossa causa"
-            >
-              Apoie nossa causa
-            </Button>
-          </nav>
-        </span>
-      </section>
+export default function NewsPage() {
+  // Busca notícias reais do GNews
+  const { articles, loading, error } = useGNews("meio ambiente sustentabilidade", 10);
+  // Fallback para mock se não houver artigos reais
+  const { news } = useMockedNews();
+
+  // Normaliza dados para o componente NewsCard/Carousel
+  const realNews: NewsItem[] = articles.map((a, idx) => ({
+    id: a.url || String(idx),
+    title: a.title,
+    image: a.image || "/images/login-page-image.webp",
+    excerpt: a.description,
+    date: a.publishedAt,
+    tag: a.source?.name,
+    url: a.url,
+    sourceName: a.source?.name,
+  }));
+  // Adiciona campos opcionais para mock também
+  const mockNews: NewsItem[] = news.map((n, idx) => ({
+    ...n,
+    url: n.url,
+    sourceName: n.tag,
+    id: n.id || String(idx),
+  }));
+  const allNews: NewsItem[] = realNews.length > 0 ? realNews : mockNews;
+  const featured = allNews.slice(0, 3);
+  let list = allNews.slice(3);
+
+  // Garantir número par de cards para manter layout consistente
+  if (list.length % 2 !== 0) {
+    // tente usar uma notícia mock extra não utilizada
+    const extraFromMock = mockNews.find((m) => !allNews.some((a) => a.id === m.id));
+    if (extraFromMock) {
+      list = list.concat(extraFromMock);
+    } else {
+      // fallback: duplicar o último item com novo id
+      const last = list[list.length - 1];
+      list = list.concat({ ...last, id: `${last.id}-dup` });
+    }
+  }
+
+  return (
+    <main className="min-h-screen bg-slate-50">
+      <Header />
+
+      <div className="max-w-7xl mx-auto p-4 md:p-8">
+        <h1 className="text-3xl md:text-4xl font-bold mb-6">Notícias Ambientais</h1>
+
+        {loading && <p className="text-slate-500">Carregando notícias...</p>}
+        {error && <p className="text-red-600">{error}</p>}
+
+        {/* Carrossel hero */}
+  <NewsCarousel items={featured} />
+
+        {/* Grid com todos os cards restantes */}
+        <section className={`mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-${Math.min(list.length, 5)} gap-6`}>
+          {list.map((item) => (
+            <NewsCard key={item.id} item={item} />
+          ))}
+        </section>
+      </div>
     </main>
   );
 }
+
