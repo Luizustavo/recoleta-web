@@ -15,35 +15,37 @@ export default function useGNews(query: string, max: number = 10) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Coloque sua chave de API do GNews aqui
-  const API_KEY = process.env.NEXT_PUBLIC_GNEWS_API_KEY || "";
-
   useEffect(() => {
-    if (!API_KEY) {
-      setError("API KEY do GNews não definida");
-      setLoading(false);
-      return;
-    }
     setLoading(true);
-    fetch(
-      `https://gnews.io/api/v4/search?q=${encodeURIComponent(
-        query
-      )}&lang=pt&max=${max}&token=${API_KEY}`
-    )
-      .then((res) => res.json())
+    setError(null);
+    
+    // Usar API route interna ao invés de chamar GNews diretamente
+    fetch(`/api/news?q=${encodeURIComponent(query)}&max=${max}`)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+      })
       .then((data) => {
-        if (data.articles) {
+        if (data.error) {
+          setError(data.error);
+          setArticles([]);
+        } else if (data.articles && Array.isArray(data.articles)) {
           setArticles(data.articles);
         } else {
           setError("Nenhum artigo encontrado");
+          setArticles([]);
         }
         setLoading(false);
       })
       .catch((err) => {
+        console.error("Erro ao buscar notícias:", err);
         setError("Erro ao buscar notícias: " + err.message);
+        setArticles([]);
         setLoading(false);
       });
-  }, [query, max, API_KEY]);
+  }, [query, max]);
 
   return { articles, loading, error };
 }
