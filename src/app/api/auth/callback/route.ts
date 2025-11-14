@@ -4,9 +4,15 @@ import { authOptions } from "@/lib/auth-options";
 
 export async function GET(request: NextRequest) {
   try {
+    console.log("🔄 Callback route triggered");
+    
     const session = await getServerSession(authOptions);
     
+    console.log("Session exists:", !!session);
+    console.log("Backend token exists:", !!session?.backendToken);
+    
     if (!session || !session.backendToken) {
+      console.error("❌ No session or backend token, redirecting to login");
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
