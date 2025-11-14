@@ -1,4 +1,5 @@
 import { AuthProvider } from "@/context/auth-context";
+import { Analytics } from "@vercel/analytics/next";
 import { Toaster } from "@/components/ui/sonner";
 import { Roboto } from "next/font/google";
 
@@ -26,6 +27,7 @@ export default function RootLayout({
         <AuthProvider>
           {children}
           <Toaster />
+          <Analytics />
         </AuthProvider>
       </body>
     </html>
