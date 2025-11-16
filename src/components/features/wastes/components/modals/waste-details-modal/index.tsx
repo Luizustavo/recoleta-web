@@ -38,6 +38,19 @@ export function WasteDetailsModal({
   
   if (!waste) return null;
 
+  const getFullImageUrls = () => {
+    if (!waste.images || waste.images.length === 0) return [];
+    
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    return waste.images.map(image => {
+      if (image.startsWith('http')) return image;
+      return `${apiUrl}/api/waste-image/${image}`;
+    });
+  };
+
+  const fullImageUrls = getFullImageUrls();
+
+
   const handleImageSelect = (index: number) => {
     setSelectedImageIndex(index);
   };
@@ -86,8 +99,9 @@ export function WasteDetailsModal({
         </DialogContent>
       </Dialog>
 
+    
       <WasteImageViewer
-        images={waste.images || []}
+        images={fullImageUrls}
         selectedIndex={selectedImageIndex}
         onClose={handleImageViewerClose}
         onNavigate={handleImageNavigation}
