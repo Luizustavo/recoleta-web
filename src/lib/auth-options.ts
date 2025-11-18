@@ -1,7 +1,6 @@
 import { Account, Profile, Session, User } from "next-auth";
 import { AuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import FacebookProvider from "next-auth/providers/facebook";
 import { CredentialInput } from "next-auth/providers/credentials";
 
 // Extend Session type to include accessToken and backendToken
@@ -25,8 +24,6 @@ interface ExtendedAccount extends Account {
 const {
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
-  FACEBOOK_CLIENT_ID,
-  FACEBOOK_CLIENT_SECRET,
   NEXTAUTH_SECRET,
   API_URL, // your backend base URL
 } = process.env;
@@ -37,10 +34,7 @@ export const authOptions: AuthOptions = {
     GoogleProvider({
       clientId: GOOGLE_CLIENT_ID!,
       clientSecret: GOOGLE_CLIENT_SECRET!,
-    }),
-    FacebookProvider({
-      clientId: FACEBOOK_CLIENT_ID!,
-      clientSecret: FACEBOOK_CLIENT_SECRET!,
+      authorization: { params: { prompt: "select_account" } },
     }),
   ],
 
@@ -53,12 +47,12 @@ export const authOptions: AuthOptions = {
       credentials?: Record<string, CredentialInput> | undefined;
     }) {
       const { account, profile } = params;
-      
+
       console.log("🔐 SignIn callback triggered");
       console.log("Environment:", process.env.NODE_ENV);
       console.log("API_URL:", API_URL);
       console.log("Provider:", account?.provider);
-      
+
       if (!account?.provider || !account?.access_token) {
         console.error("❌ Missing provider or access_token in account object");
         return false;
@@ -81,8 +75,11 @@ export const authOptions: AuthOptions = {
 
       // Send the OAuth token to your backend to log in or register the user
       try {
-        console.log(`🔄 Attempting to sync ${providerRoute} login with backend:`, backendUrl);
-        
+        console.log(
+          `🔄 Attempting to sync ${providerRoute} login with backend:`,
+          backendUrl
+        );
+
         const response = await fetch(backendUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -95,10 +92,13 @@ export const authOptions: AuthOptions = {
 
         if (!response.ok) {
           const errorText = await response.text();
-          console.error(`❌ Backend login failed with status ${response.status}:`, errorText);
+          console.error(
+            `❌ Backend login failed with status ${response.status}:`,
+            errorText
+          );
           throw new Error(`Backend login failed: ${response.status}`);
         }
-        
+
         const data = await response.json();
         console.log(`✅ ${providerRoute} login synced with backend:`, data);
 
@@ -111,7 +111,7 @@ export const authOptions: AuthOptions = {
       } catch (err) {
         console.error("❌ Error syncing social login with backend:", err);
         // Em desenvolvimento, podemos querer ver o erro completo
-        if (process.env.NODE_ENV === 'development') {
+        if (process.env.NODE_ENV === "development") {
           console.error("Full error:", err);
         }
         return false;
