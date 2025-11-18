@@ -91,49 +91,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   // --- NEW: Google Login ---
-  const signInWithGoogle = async (): Promise<void> => {
+  const signInWithGoogle = async () => {
     try {
-      const response = await fetch("/api/auth/google", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-      });
-
-      if (!response.ok) throw new Error("Falha na autenticação com Google!");
-
-      const data = await response.json();
-      console.log("Google login response:", data);
-      // Trigger NextAuth Google OAuth flow
       await nextAuthSignIn("google", {
-        callbackUrl: "/dashboard", // redirect after successful login
+        callbackUrl: "/dashboard",
+        prompt: "select_account",
       });
-
-      // No need to handle token manually; NextAuth sets session cookies
-      console.log("Google sign-in triggered");
     } catch (error) {
       console.error("Erro no login com Google:", error);
-    }
-  };
-
-  // --- NEW: Facebook Login ---
-  const signInWithFacebook = async () => {
-    try {
-      const response = await fetch("/api/auth/facebook", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-      });
-
-      if (!response.ok) throw new Error("Falha na autenticação com Facebook");
-
-      const data = await response.json();
-      console.log("Facebook login response:", data);
-
-      localStorage.setItem("token", data.access_token);
-
-      router.push("/dashboard");
-      return true;
-    } catch (error) {
-      console.error("Erro no login com Facebook:", error);
-      return false;
     }
   };
 
@@ -142,7 +107,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     signUp,
     signOut,
     signInWithGoogle,
-    signInWithFacebook,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
