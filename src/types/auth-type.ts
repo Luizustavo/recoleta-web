@@ -17,7 +17,6 @@ export interface AuthContextData {
   signIn: (user: AccessType) => Promise<boolean>;
   signUp: (user: RegisterType) => Promise<boolean>;
   signInWithGoogle: () => Promise<void>;
-  signInWithFacebook: () => Promise<boolean>;
   signOut: () => Promise<void>;
 }
 
